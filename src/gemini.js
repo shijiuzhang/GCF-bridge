@@ -82,7 +82,7 @@ function extractResponseText(raw) {
   for (let i = texts.length - 1; i >= 0; i--) {
     if (texts[i].trim()) { text = texts[i]; break; }
   }
-  return cleanText(text);
+  return cleanText(text).trim();
 }
 
 async function* streamGeminiResponse(prompt, modelMode, thinkMode) {
@@ -167,8 +167,7 @@ function cleanText(text) {
     .replace(/```(?:python|javascript|text)\?code_(?:reference|stdout)&code_event_index=\d+\n.*?```\n?/gs, "")
     .replace(/\\u003d/g, "=")
     .replace(/\\u003c/g, "<")
-    .replace(/\\u003e/g, ">")
-    .trim();
+    .replace(/\\u003e/g, ">");
 }
 
 export { sendToGemini, extractResponseText, streamGeminiResponse };

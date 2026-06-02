@@ -1,5 +1,7 @@
-import { MODELS, DEFAULT_MODEL, resolveModel, generateId, MAX_TOOL_REDELIVERY } from "./src/config.js";
+import { MODELS, DEFAULT_MODEL, resolveModel, generateId, MAX_TOOL_REDELIVERY, truncateToolResult } from "./src/config.js";
 import { sendToGemini, extractResponseText, streamGeminiResponse } from "./src/gemini.js";
+import { contentToBlocks } from "./src/delta.js";
+import { extractSystemPrompt, buildToolsPrompt, parseToolCalls } from "./src/anthropic.js";
 import http from "node:http";
 
 function corsHeaders() {
@@ -59,15 +61,33 @@ function sendMessagesHandler(res, body) {
 }
 
 async function handleStreamHTTP(res, modelInfo, messages, reqData) {
+  const sysPrompt = extractSystemPrompt(reqData.system);
+  const toolsPrompt = buildToolsPrompt(reqData.tools);
+
   const parts = [];
   for (const msg of messages) {
     const role = msg.role || "user";
-    const content = typeof msg.content === "string" ? msg.content : (Array.isArray(msg.content) ? msg.content.filter(c => c.type === "text").map(c => c.text).join(" ") : "");
-    if (role === "system") parts.push(`[System instruction]: ${content}`);
-    else if (role === "assistant") parts.push(`[Assistant]: ${content}`);
-    else parts.push(content);
+    const blocks = contentToBlocks(msg.content);
+    let text = "";
+    for (const b of blocks) {
+      if (b.type === "text") {
+        text += (b.text || "") + "\n";
+      } else if (b.type === "tool_use") {
+        text += `\n[You requested Tool: ${b.name}]\n`;
+      } else if (b.type === "tool_result") {
+        let raw = typeof b.content === "string" ? b.content : (Array.isArray(b.content) ? b.content.map(c => typeof c === "object" && c.text ? c.text : "").join("\n") : String(b.content || ""));
+        raw = truncateToolResult(raw);
+        text += `\n[Tool Output Result]:\n${raw}\n`;
+      }
+    }
+    text = text.trim();
+    if (role === "system") parts.push(`[System instruction]: ${text}`);
+    else if (role === "assistant") parts.push(`[Assistant]: ${text}`);
+    else parts.push(text);
   }
-  const prompt = parts.join("\n\n");
+  const historyText = parts.join("\n\n");
+  const prompt = `[SYSTEM INSTRUCTIONS]\n${sysPrompt}\n\n${toolsPrompt}\n[CONVERSATION HISTORY]\n${historyText}`.replace(/\n{3,}/g, "\n\n").trim();
+
   const msgId = `msg_${generateId("")}`;
 
   res.writeHead(200, {
@@ -84,21 +104,57 @@ async function handleStreamHTTP(res, modelInfo, messages, reqData) {
   res.write(sse("content_block_start", { index: 0, content_block: { type: "text", text: "" } }));
 
   let fullText = "";
+  let isStreamingToClient = true;
+
   try {
     for await (const chunk of streamGeminiResponse(prompt, modelInfo.mode, modelInfo.think)) {
       fullText += chunk;
-      res.write(sse("content_block_delta", { index: 0, delta: { type: "text_delta", text: chunk } }));
+      if (isStreamingToClient) {
+        const toolCallIdx = fullText.indexOf("<TOOL_CALL>");
+        if (toolCallIdx !== -1) {
+          const sentLength = fullText.length - chunk.length;
+          if (toolCallIdx > sentLength) {
+            const extra = fullText.slice(sentLength, toolCallIdx);
+            if (extra) res.write(sse("content_block_delta", { index: 0, delta: { type: "text_delta", text: extra } }));
+          }
+          isStreamingToClient = false;
+        } else {
+          res.write(sse("content_block_delta", { index: 0, delta: { type: "text_delta", text: chunk } }));
+        }
+      }
     }
   } catch {
     try {
       const raw = await sendToGemini(prompt, modelInfo.mode, modelInfo.think);
       fullText = extractResponseText(raw);
-      if (fullText) res.write(sse("content_block_delta", { index: 0, delta: { type: "text_delta", text: fullText } }));
+      if (isStreamingToClient && fullText) {
+        const { text: clean } = parseToolCalls(fullText);
+        res.write(sse("content_block_delta", { index: 0, delta: { type: "text_delta", text: clean } }));
+      }
     } catch {}
   }
 
   res.write(sse("content_block_stop", { index: 0 }));
-  res.write(sse("message_delta", { delta: { stop_reason: "end_turn" }, usage: { output_tokens: 0 } }));
+
+  const { toolBlocks } = parseToolCalls(fullText);
+
+  // Send tool blocks
+  let blockIdx = 1;
+  for (const tb of toolBlocks) {
+    res.write(sse("content_block_start", {
+      index: blockIdx,
+      content_block: { type: "tool_use", id: tb.id, name: tb.name, input: {} }
+    }));
+    res.write(sse("content_block_delta", {
+      index: blockIdx,
+      delta: { type: "input_json_delta", partial_json: JSON.stringify(tb.input) }
+    }));
+    res.write(sse("content_block_stop", { index: blockIdx }));
+    blockIdx++;
+  }
+
+  const stopReason = toolBlocks.length ? "tool_use" : "end_turn";
+  res.write(sse("message_delta", { delta: { stop_reason: stopReason }, usage: { output_tokens: 0 } }));
   res.write(sse("message_stop", {}));
   res.write("data: [DONE]\n\n");
   res.end();
@@ -138,15 +194,17 @@ function handleChatCompletions(res, body) {
           res.write(`data: ${JSON.stringify(data)}\n\n`);
         }
       } catch {
-        const raw = await sendToGemini(prompt, modelInfo.mode, modelInfo.think);
-        const text = extractResponseText(raw);
-        if (text) {
-          const data = {
-            id: cid, object: "chat.completion.chunk", created: Math.floor(Date.now() / 1000),
-            model: modelInfo.name, choices: [{ index: 0, delta: { content: text }, finish_reason: null }],
-          };
-          res.write(`data: ${JSON.stringify(data)}\n\n`);
-        }
+        try {
+          const raw = await sendToGemini(prompt, modelInfo.mode, modelInfo.think);
+          const text = extractResponseText(raw);
+          if (text) {
+            const data = {
+              id: cid, object: "chat.completion.chunk", created: Math.floor(Date.now() / 1000),
+              model: modelInfo.name, choices: [{ index: 0, delta: { content: text }, finish_reason: null }],
+            };
+            res.write(`data: ${JSON.stringify(data)}\n\n`);
+          }
+        } catch {}
       }
       res.write(`data: ${JSON.stringify({ id: cid, object: "chat.completion.chunk", created: Math.floor(Date.now() / 1000), model: modelInfo.name, choices: [{ index: 0, delta: {}, finish_reason: "stop" }] })}\n\n`);
       res.write("data: [DONE]\n\n");

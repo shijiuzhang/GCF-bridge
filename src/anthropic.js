@@ -32,6 +32,20 @@ function extractSystemPrompt(system) {
   return "";
 }
 
+function stripTrailingJsonQuote(val) {
+  val = (val || "").trim();
+  if (val.endsWith("</TOOL_CALL>")) {
+    val = val.slice(0, -12).trim();
+  }
+  while (val.endsWith("}")) {
+    val = val.slice(0, -1).trim();
+  }
+  if (val.endsWith('"')) {
+    val = val.slice(0, -1);
+  }
+  return val;
+}
+
 function repairToolJson(raw) {
   raw = raw.replace(/```json/g, "").replace(/```/g, "").trim();
   try { return JSON.parse(raw); } catch {}
@@ -53,10 +67,7 @@ function repairToolJson(raw) {
         const fpi = val.lastIndexOf('", "file_path"');
         if (fpi !== -1) val = val.slice(0, fpi);
       }
-      val = val.trim();
-      for (const suf of ['}}</TOOL_CALL>', "</TOOL_CALL>", "}}", "}", '"']) {
-        if (val.endsWith(suf)) { val = val.slice(0, -suf.length).trim(); break; }
-      }
+      val = stripTrailingJsonQuote(val);
       val = val.replace(/\\"/g, '"').replace(/\\n/g, "\n").replace(/\\\\/g, "\\");
       input[key] = val;
     }
@@ -71,13 +82,11 @@ function repairToolJson(raw) {
     if (oi !== -1 && ni !== -1) {
       const [fk, fi, sk, si] = oi < ni ? ["old_string", oi, "new_string", ni] : ["new_string", ni, "old_string", oi];
       const v1s = raw.indexOf('"', raw.indexOf(":", fi)) + 1;
-      const v1e = raw.lastIndexOf('"', 0, raw.lastIndexOf(",", 0, Math.max(oi, ni)));
+      const commaIdx = raw.lastIndexOf(",", si);
+      const v1e = raw.lastIndexOf('"', commaIdx);
       const v1 = raw.slice(v1s, v1e);
       let v2 = raw.slice(raw.indexOf('"', raw.indexOf(":", si)) + 1);
-      v2 = v2.trim();
-      for (const suf of ['"}}', "}", '"']) {
-        if (v2.endsWith(suf)) { v2 = v2.slice(0, -suf.length).trim(); break; }
-      }
+      v2 = stripTrailingJsonQuote(v2);
       input[fk] = v1.replace(/\\"/g, '"').replace(/\\n/g, "\n").replace(/\\\\/g, "\\");
       input[sk] = v2.replace(/\\"/g, '"').replace(/\\n/g, "\n").replace(/\\\\/g, "\\");
     }

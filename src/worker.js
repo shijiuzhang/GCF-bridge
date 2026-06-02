@@ -1,4 +1,4 @@
-import { MODELS, DEFAULT_MODEL, resolveModel, generateId, MAX_TOOL_REDELIVERY } from "./config.js";
+import { MODELS, DEFAULT_MODEL, resolveModel, generateId, MAX_TOOL_REDELIVERY, truncateToolResult } from "./config.js";
 import { sendToGemini, extractResponseText, streamGeminiResponse } from "./gemini.js";
 import { getSession, saveSession, contentToBlocks, blockSignatures, computeDelta, blocksToString } from "./delta.js";
 import {
@@ -41,7 +41,8 @@ async function handleAnthropicMessages(request, env) {
   if (!messages.length) return jsonResp({ error: { type: "invalid_request_error", message: "messages is required" } }, 400);
 
   const modelInfo = resolveModel(body.model);
-  const sessionId = body.model || "default";
+  const apiKey = request.headers.get("x-api-key") || request.headers.get("authorization") || "";
+  const sessionId = (apiKey + "_" + (body.model || "default")).replace(/[^a-zA-Z0-9_]/g, "").slice(0, 100) || "default";
   const msgId = `msg_${generateId("")}`;
   const stream = body.stream || false;
   const reqDump = JSON.stringify(body);
@@ -56,7 +57,6 @@ async function handleAnthropicMessages(request, env) {
   }
 
   const session = await getSession(env, sessionId);
-  const isSessionNew = session.messageCount === 0;
 
   const sysPrompt = extractSystemPrompt(body.system);
   const toolsPrompt = buildToolsPrompt(body.tools);
@@ -66,21 +66,6 @@ async function handleAnthropicMessages(request, env) {
   const currentSigs = blockSignatures(currentBlocks);
   const deltaBlocks = computeDelta(session.lastBlocks, currentSigs);
   session.lastBlocks = currentSigs;
-
-  const delta = blocksToString(deltaBlocks);
-  const full = blocksToString(currentBlocks);
-
-  let { text: deltaText, hasUserText, hasToolResult } = delta;
-  const { text: fullText } = full;
-
-  deltaText = deltaText.replace(/<system-reminder>[\s\S]*?<\/system-reminder>/g, "").trim();
-
-  if (hasToolResult && !hasUserText) {
-    if (!deltaText.trim()) deltaText = "[All tools completed with no stdout output.]";
-    deltaText += "\n\n[Tools completed successfully. Provide a brief confirmation to the user of what was done.]";
-  } else if (!hasUserText && deltaText) {
-    deltaText += "\n\n[Tools executed successfully. Await next user instruction before taking further actions.]";
-  }
 
   if (!deltaBlocks.length) {
     if (session.pendingToolIds.length && session.toolRedeliveryCount < MAX_TOOL_REDELIVERY) {
@@ -94,14 +79,30 @@ async function handleAnthropicMessages(request, env) {
     return jsonResp({ id: msgId, type: "message", role: "assistant", content: [{ type: "text", text: "Standing by." }], model: modelInfo.name, stop_reason: "end_turn", usage: { input_tokens: 0, output_tokens: 0 } });
   }
 
-  let prompt;
-  if (isSessionNew || deltaBlocks.length === currentBlocks.length) {
-    prompt = `[SYSTEM INSTRUCTIONS]\n${sysPrompt}\n\n${toolsPrompt}\n[LATEST MESSAGE]\n${fullText}`;
-  } else {
-    const reminder = 'Reminder: To execute a tool, reply EXACTLY with: <TOOL_CALL>{"name": "...", "input": {...}}</TOOL_CALL>\n\n';
-    prompt = `${reminder}[NEW EVENT]\n${deltaText}`;
+  // Construct prompt from full history, truncating tool results to respect token limits
+  const parts = [];
+  for (const msg of messages) {
+    const role = msg.role || "user";
+    const blocks = contentToBlocks(msg.content);
+    let text = "";
+    for (const b of blocks) {
+      if (b.type === "text") {
+        text += (b.text || "") + "\n";
+      } else if (b.type === "tool_use") {
+        text += `\n[You requested Tool: ${b.name}]\n`;
+      } else if (b.type === "tool_result") {
+        let raw = typeof b.content === "string" ? b.content : (Array.isArray(b.content) ? b.content.map(c => typeof c === "object" && c.text ? c.text : "").join("\n") : String(b.content || ""));
+        raw = truncateToolResult(raw);
+        text += `\n[Tool Output Result]:\n${raw}\n`;
+      }
+    }
+    text = text.trim();
+    if (role === "system") parts.push(`[System instruction]: ${text}`);
+    else if (role === "assistant") parts.push(`[Assistant]: ${text}`);
+    else parts.push(text);
   }
-  prompt = prompt.replace(/\n{3,}/g, "\n\n").trim();
+  const historyText = parts.join("\n\n");
+  const prompt = `[SYSTEM INSTRUCTIONS]\n${sysPrompt}\n\n${toolsPrompt}\n[CONVERSATION HISTORY]\n${historyText}`.replace(/\n{3,}/g, "\n\n").trim();
 
   if (stream) {
     return sseResp(createStream(modelInfo, prompt, msgId, session, sessionId, env));
@@ -150,33 +151,79 @@ async function* handleStream(modelInfo, prompt, msgId, session, sessionId, env) 
   yield contentBlockStart(0);
 
   let fullText = "";
+  let isStreamingToClient = true;
+
   try {
     for await (const chunk of streamGeminiResponse(prompt, modelInfo.mode, modelInfo.think)) {
       fullText += chunk;
-      yield contentBlockDelta(0, chunk);
+      if (isStreamingToClient) {
+        const toolCallIdx = fullText.indexOf("<TOOL_CALL>");
+        if (toolCallIdx !== -1) {
+          const sentLength = fullText.length - chunk.length;
+          if (toolCallIdx > sentLength) {
+            const extra = fullText.slice(sentLength, toolCallIdx);
+            if (extra) yield contentBlockDelta(0, extra);
+          }
+          isStreamingToClient = false;
+        } else {
+          yield contentBlockDelta(0, chunk);
+        }
+      }
     }
   } catch {
-    const raw = await sendToGemini(prompt, modelInfo.mode, modelInfo.think);
-    fullText = extractResponseText(raw);
-    if (fullText) yield contentBlockDelta(0, fullText);
+    try {
+      const raw = await sendToGemini(prompt, modelInfo.mode, modelInfo.think);
+      fullText = extractResponseText(raw);
+      if (isStreamingToClient && fullText) {
+        const { text: clean } = parseToolCalls(fullText);
+        yield contentBlockDelta(0, clean);
+      }
+    } catch {}
   }
 
   yield contentBlockStop(0);
 
-  const toolData = parseToolCalls(fullText);
-  const stopReason = toolData.toolBlocks.length ? "tool_use" : "end_turn";
+  const { text: cleanTextContent, toolBlocks } = parseToolCalls(fullText);
 
+  // Send tool blocks
+  let blockIdx = 1;
+  for (const tb of toolBlocks) {
+    yield sseEvent("content_block_start", {
+      index: blockIdx,
+      content_block: { type: "tool_use", id: tb.id, name: tb.name, input: {} }
+    });
+    yield sseEvent("content_block_delta", {
+      index: blockIdx,
+      delta: { type: "input_json_delta", partial_json: JSON.stringify(tb.input) }
+    });
+    yield sseEvent("content_block_stop", { index: blockIdx });
+    blockIdx++;
+  }
+
+  const stopReason = toolBlocks.length ? "tool_use" : "end_turn";
   yield messageDelta(stopReason);
   yield messageStop();
   yield "data: [DONE]\n\n";
 
-  if (toolData.toolBlocks.length) {
-    session.pendingToolIds = toolData.toolBlocks.map(b => b.id);
+  if (toolBlocks.length) {
+    session.pendingToolIds = toolBlocks.map(b => b.id);
     session.toolRedeliveryCount = 0;
+    session.lastToolResponse = {
+      id: msgId,
+      type: "message",
+      role: "assistant",
+      content: [
+        ...(cleanTextContent ? [{ type: "text", text: cleanTextContent }] : []),
+        ...toolBlocks
+      ],
+      model: modelInfo.name,
+      stop_reason: "tool_use",
+      usage: { input_tokens: 100, output_tokens: 100 }
+    };
   } else {
     session.pendingToolIds = [];
+    session.lastToolResponse = null;
   }
-  session.lastToolResponse = null;
   session.messageCount++;
   await saveSession(env, sessionId, session);
 }
