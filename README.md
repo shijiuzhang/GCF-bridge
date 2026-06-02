@@ -13,6 +13,29 @@
 - **Tool Calling** — 支持 Anthropic 工具调用格式
 - **SSE 流式输出** — 支持 streaming response
 
+## v1.5 更新内容
+
+### Bug 修复
+
+- **修复 async generator 不能直接作为 ReadableStream body** — `handleStream` 返回的 async generator 需要包装为 ReadableStream，否则 stream 端点无法工作
+- **修复 stream fallback 条件永远为 false** — `!fullText.includes(fullText.slice(0,50))` 永远返回 false，导致 fallback 时从不发送数据
+- **修复 TOOL_CALL 正则无法处理嵌套 JSON** — 非贪婪匹配 `\{.*?\}` 在遇到第一个 `}` 就停止，嵌套对象被截断。新增 `extractToolCallJson()` 用大括号计数正确匹配
+- **修复流结束后 buffer 残余内容丢失** — 流解析器最后未处理的 buffer 内容被丢弃
+- **修复 `content_block_delta` 包含非标准 `usage` 字段** — 真实 Anthropic API 不在 delta 事件中返回 usage
+- **修复 `parseToolCalls` 双重反转义导致值损坏** — `repairToolJson` 已处理过转义，`parseToolCalls` 又做一遍导致内容损坏
+
+### 新增
+
+- **本地 Node.js 服务器** (`server.js`) — 无需 Cloudflare 即可本地测试 Anthropic 和 OpenAI 端点
+- 添加 `nodejs_compat` compatibility flag
+
+### 运行方式
+
+```bash
+npm install
+node server.js                # 本地运行，端口 8787
+```
+
 ## 与同类项目对比
 
 | 特性 | GCF Bridge | Chimera | GeminiBridge |
@@ -73,6 +96,29 @@ MIT
 - **Tool Calling** — supports Anthropic tool calling format
 - **SSE streaming** — streaming response support
 
+## v1.5 Changelog
+
+### Bug Fixes
+
+- **Fix async generator not wrapped as ReadableStream** — `handleStream` returns an async generator that cannot be used as Response body directly. Added `createStream()` wrapper
+- **Fix streaming fallback condition always false** — `!fullText.includes(fullText.slice(0,50))` is always false, fallback path never sends data
+- **Fix TOOL_CALL regex failing on nested JSON** — non-greedy `\{.*?\}` stops at first `}`, truncating nested objects. Added `extractToolCallJson()` with brace counting
+- **Fix stream buffer remainder content lost** — remaining bytes after stream end are now flushed
+- **Fix non-standard `usage` field in `content_block_delta`** — real Anthropic API doesn't include usage in delta events
+- **Fix double-unescape corruption in `parseToolCalls`** — `repairToolJson` already handles escaping, the extra unescape corrupted values
+
+### New
+
+- **Local Node.js server** (`server.js`) — test Anthropic and OpenAI endpoints locally without Cloudflare
+- Add `nodejs_compat` compatibility flag
+
+### Usage
+
+```bash
+npm install
+node server.js                # Local server on port 8787
+```
+
 ## Comparison
 
 | Feature | GCF Bridge | Chimera | GeminiBridge |
@@ -132,6 +178,29 @@ MIT
 - **Keine Authentifizierung** — anonymer Modus nutzt Gemini 3.5 Flash, kein Google-Konto erforderlich
 - **Tool Calling** — unterstützt das Anthropic-Tool-Calling-Format
 - **SSE Streaming** — Streaming-Antworten werden unterstützt
+
+## v1.5 Änderungen
+
+### Fehlerbehebungen
+
+- **Async Generator nicht als ReadableStream verpackt** — `handleStream` gibt einen async generator zurück, der nicht direkt als Response body verwendet werden kann. `createStream()` Wrapper hinzugefügt
+- **Stream-Fallback-Bedingung immer false** — `!fullText.includes(fullText.slice(0,50))` ist immer false, der Fallback sendet nie Daten
+- **TOOL_CALL Regex verarbeitet verschachteltes JSON nicht** — Non-Greedy `\{.*?\}` stoppt beim ersten `}`, verschachtelte Objekte werden abgeschnitten. `extractToolCallJson()` mit Klammer-Zählung hinzugefügt
+- **Stream-Buffer Restinhalt verloren** — verbleibende Bytes nach Stream-ende werden jetzt verarbeitet
+- **Nicht-standard `usage`-Feld in `content_block_delta`** — echte Anthropic API liefert kein usage in delta-Events
+- **Doppelte Unescape-Verfälschung in `parseToolCalls`** — `repairToolJson` behandelt Escaping bereits, zusätzliche Verarbeitung verfälschte Werte
+
+### Neu
+
+- **Lokaler Node.js Server** (`server.js`) — Anthropic- und OpenAI-Endpunkte lokal ohne Cloudflare testen
+- `nodejs_compat` Compatibility-Flag hinzugefügt
+
+### Verwendung
+
+```bash
+npm install
+node server.js                # lokaler Server auf Port 8787
+```
 
 ## Vergleich
 
