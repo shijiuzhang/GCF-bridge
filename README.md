@@ -13,6 +13,44 @@
 - **Tool Calling** — 支持 Anthropic 工具调用格式
 - **SSE 流式输出** — 支持 streaming response
 
+## v1.8 更新与配置指南
+
+### 1. Claude Code 全局配置指南 (`~/.claude/settings.json`)
+
+为了在有防火墙的环境下正常连接 Cloudflare Worker，需要对 Claude Code 进行全局代理和接口重定向配置。在 Mac 上，配置文件位于 `~/.claude/settings.json`。请使用以下 JSON 结构覆盖配置：
+
+```json
+{
+    "env": {
+        "HTTP_PROXY": "http://127.0.0.1:7897",
+        "HTTPS_PROXY": "http://127.0.0.1:7897",
+        "ANTHROPIC_AUTH_TOKEN": "any",
+        "ANTHROPIC_BASE_URL": "https://gcf-bridge.zhangyu76.workers.dev/v1",
+        "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": 1,
+        "API_TIMEOUT_MS": 600000,
+        "ANTHROPIC_MODEL": "claude-3-5-sonnet-20241022",
+        "ANTHROPIC_SMALL_FAST_MODEL": "claude-3-5-sonnet-20241022",
+        "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-3-5-sonnet-20241022",
+        "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-3-5-sonnet-20241022",
+        "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-3-5-sonnet-20241022"
+    },
+    "permissions": {
+        "allow": [],
+        "deny": []
+    }
+}
+```
+
+**关键配置项解释：**
+- `HTTP_PROXY` / `HTTPS_PROXY`：**解决终端代理无法被 Node.js 读取导致超时的问题**。因为 Node.js 不会自动读取 macOS 的全局系统代理，必须在此处手动指定本地代理软件（如 Clash 默认混合端口 `7897`）的端口。
+- `ANTHROPIC_BASE_URL`：您在 Cloudflare 部署的 Worker 网关地址。
+- `ANTHROPIC_MODEL` 系列：**解决客户端模型权限报错的问题**。因为 Claude Code 启动时会校验模型是否在 Anthropic 的官方列表中。我们将其全部设为官方支持的 `claude-3-5-sonnet-20241022` 绕过校验；Worker 后端收到请求后会自动将未知模型映射为您配置的 Gemini 模型。
+
+### 2. v1.8 修复的重大 Bug
+- **修复双重 `/v1/v1` 路由 404 问题**：由于 Anthropic SDK 在构建请求时，会自动在 `ANTHROPIC_BASE_URL` 后面拼接 `/v1/messages`。如果您配置的 Base URL 带有 `/v1`，就会请求到 `/v1/v1/messages` 导致 404 错误。我们在 Worker 路由前置增加了自动去重机制，支持自动将 `/v1/v1/...` 缩减为 `/v1/...`。
+- **修复网络延迟重试导致的 `Standing by.` 假死问题**：由于网络偶发波动，客户端由于超时触发重试，向 Worker 发送相同的消息。Worker 的防重复机制会判定此消息为“已处理”，并直接返回空白状态 `"Standing by."`。现在在 KV 中增加了 `session.lastResponse` 全量缓存，当发生重复消息重试时，会自动将之前成功生成的真实应答以标准 SSE 流的形式重新推送给客户端，彻底杜绝了 `Standing by.` 的阻断现象。
+- **补充可用模型接口 (`/v1/models`) 的 Claude 官方白名单**：修改了模型的获取接口，向客户端伪造了齐全的 Anthropic 原生模型记录，彻底绕过了 Claude Code 本地的初始化校验拦截。
+
 ## v1.62 更新内容
 
 ### Bug 修复
@@ -114,6 +152,44 @@ MIT
 - **Tool Calling** — supports Anthropic tool calling format
 - **SSE streaming** — streaming response support
 
+## v1.8 Changelog & Configuration Guide
+
+### 1. Claude Code Global Configuration Guide (`~/.claude/settings.json`)
+
+To run Claude Code behind firewalls and connect to the Cloudflare Worker seamlessly, you need to configure a local proxy and override the model routing. On macOS, edit the file `~/.claude/settings.json` and replace its content with the following:
+
+```json
+{
+    "env": {
+        "HTTP_PROXY": "http://127.0.0.1:7897",
+        "HTTPS_PROXY": "http://127.0.0.1:7897",
+        "ANTHROPIC_AUTH_TOKEN": "any",
+        "ANTHROPIC_BASE_URL": "https://gcf-bridge.zhangyu76.workers.dev/v1",
+        "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": 1,
+        "API_TIMEOUT_MS": 600000,
+        "ANTHROPIC_MODEL": "claude-3-5-sonnet-20241022",
+        "ANTHROPIC_SMALL_FAST_MODEL": "claude-3-5-sonnet-20241022",
+        "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-3-5-sonnet-20241022",
+        "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-3-5-sonnet-20241022",
+        "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-3-5-sonnet-20241022"
+    },
+    "permissions": {
+        "allow": [],
+        "deny": []
+    }
+}
+```
+
+**Key Parameters Explained:**
+- `HTTP_PROXY` / `HTTPS_PROXY`: **Fixes Node.js ignoring macOS system proxies**. Since Node.js does not automatically inherit macOS system-wide preferences, setting this pointing to your proxy (e.g. Clash mixed port `7897`) forces it to route through the proxy.
+- `ANTHROPIC_BASE_URL`: Your deployed Cloudflare Worker gateway address.
+- `ANTHROPIC_MODEL` entries: **Bypasses model permission verification**. Forces Claude Code to request standard `claude-3-5-sonnet-20241022` which it internally permits. The Worker backend will automatically intercept and map this to Gemini.
+
+### 2. Major Bugs Resolved in v1.8
+- **Fixed double `/v1/v1` routes resulting in 404**: The Anthropic SDK automatically appends `/v1/messages` to the `ANTHROPIC_BASE_URL`. If the base URL configured by the user ends in `/v1`, it results in `/v1/v1/messages`. Added a router preprocessor in the Worker to automatically normalize `/v1/v1/...` into `/v1/...`.
+- **Fixed connection timeout retries triggering `Standing by.`**: On network hiccups, the client retries the same request. The duplicate-request filter previously flagged this as "processed" and instantly returned a fallback `"Standing by."`. We introduced `session.lastResponse` caching so that client retries will correctly retrieve and stream the actual generated response instead of mock placeholders.
+- **Added Claude model catalog to `/v1/models` endpoint**: Populated the models endpoint list with standard Anthropic model listings to successfully pass client-side boot validation checks.
+
 ## v1.62 Changelog
 
 ### Bug Fixes
@@ -214,6 +290,44 @@ MIT
 - **Keine Authentifizierung** — anonymer Modus nutzt Gemini 3.5 Flash, kein Google-Konto erforderlich
 - **Tool Calling** — unterstützt das Anthropic-Tool-Calling-Format
 - **SSE Streaming** — Streaming-Antworten werden unterstützt
+
+## v1.8 Änderungen & Globale Konfigurationsanleitung
+
+### 1. Claude Code Globale Konfigurationsanleitung (`~/.claude/settings.json`)
+
+Um Claude Code hinter Netzwerk-Firewalls zu betreiben und eine reibungslose Verbindung zu Cloudflare Workers herzustellen, konfigurieren Sie die Datei `~/.claude/settings.json` auf macOS wie folgt:
+
+```json
+{
+    "env": {
+        "HTTP_PROXY": "http://127.0.0.1:7897",
+        "HTTPS_PROXY": "http://127.0.0.1:7897",
+        "ANTHROPIC_AUTH_TOKEN": "any",
+        "ANTHROPIC_BASE_URL": "https://gcf-bridge.zhangyu76.workers.dev/v1",
+        "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": 1,
+        "API_TIMEOUT_MS": 600000,
+        "ANTHROPIC_MODEL": "claude-3-5-sonnet-20241022",
+        "ANTHROPIC_SMALL_FAST_MODEL": "claude-3-5-sonnet-20241022",
+        "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-3-5-sonnet-20241022",
+        "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-3-5-sonnet-20241022",
+        "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-3-5-sonnet-20241022"
+    },
+    "permissions": {
+        "allow": [],
+        "deny": []
+    }
+}
+```
+
+**Wichtige Parameter:**
+- `HTTP_PROXY` / `HTTPS_PROXY`: **Behebt das Problem, dass Node.js macOS-System-Proxys ignoriert**. Leitet Datenverkehr direkt über das lokale Proxy-Tool (z. B. Clash-Port `7897`) um.
+- `ANTHROPIC_BASE_URL`: Die Adresse Ihres bereitgestellten Workers.
+- `ANTHROPIC_MODEL` Einträge: **Umgeht die Modellvalidierung von Claude Code**, indem standardmäßig `claude-3-5-sonnet-20241022` gesendet wird, das der Worker automatisch auf Gemini abbildet.
+
+### 2. In v1.8 behobene Fehler
+- **Fehler mit doppelten `/v1/v1`-Routen behoben**: Der Router bereinigt nun automatisch doppelte Präfixe, falls der Client `/v1/v1/...` anstelle von `/v1/...` abfragt.
+- **Fehlende Antworten bei Netzwerk-Timeouts behoben (`Standing by.`)**: Antwortdaten werden nun vollständig über `session.lastResponse` zwischengespeichert, sodass Wiederholungsversuche des Clients die echte Antwort anstelle des Platzhalters `"Standing by."` empfangen.
+- **Modellliste um Anthropic-Modelle erweitert**: Der Endpunkt `/v1/models` liefert nun auch offizielle Claude-Modelle aus, um die Client-Initialisierung zu bestehen.
 
 ## v1.62 Änderungen
 
