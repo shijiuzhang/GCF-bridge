@@ -1,11 +1,12 @@
 import { MODELS, DEFAULT_MODEL, resolveModel, generateId, MAX_TOOL_REDELIVERY, truncateToolResult } from "./config.js";
 import { sendToGemini, extractResponseText, streamGeminiResponse } from "./gemini.js";
-import { getSession, saveSession, contentToBlocks, blockSignatures, computeDelta, blocksToString } from "./delta.js";
+import { getSession, saveSession, contentToBlocks, blockSignatures, computeDelta } from "./delta.js";
 import {
   buildToolsPrompt,
   extractSystemPrompt,
   buildAnthropicResponse,
   parseToolCalls,
+  sseEvent,
   openSseEvents,
   contentBlockStart,
   contentBlockDelta,

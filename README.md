@@ -13,6 +13,13 @@
 - **Tool Calling** — 支持 Anthropic 工具调用格式
 - **SSE 流式输出** — 支持 streaming response
 
+## v1.62 更新内容
+
+### Bug 修复
+
+- **修复 Worker 流式工具调用崩溃 (sseEvent 未导入)** — `worker.js` 中的 `handleStream` 在发送工具调用 SSE 事件时调用了 `sseEvent()` 函数，但该函数未被导入，导致所有包含 `<TOOL_CALL>` 的流式响应在 Cloudflare Workers 上以 `ReferenceError` 崩溃。已将 `sseEvent` 加入导入列表。
+- **清理未使用的 `blocksToString` 死导入** — 移除了 `worker.js` 中从未使用的 `blocksToString` 导入。
+
 ## v1.61 更新内容
 
 ### Bug 修复
@@ -107,6 +114,13 @@ MIT
 - **Tool Calling** — supports Anthropic tool calling format
 - **SSE streaming** — streaming response support
 
+## v1.62 Changelog
+
+### Bug Fixes
+
+- **Fix Worker streaming tool call crash (missing sseEvent import)** — `handleStream` in `worker.js` called `sseEvent()` to emit tool call SSE events, but the function was never imported, causing all streaming responses containing `<TOOL_CALL>` to crash with `ReferenceError` on Cloudflare Workers. Added `sseEvent` to the import list.
+- **Remove unused `blocksToString` dead import** — Cleaned up the unused `blocksToString` import from `worker.js`.
+
 ## v1.61 Changelog
 
 ### Bug Fixes
@@ -200,6 +214,13 @@ MIT
 - **Keine Authentifizierung** — anonymer Modus nutzt Gemini 3.5 Flash, kein Google-Konto erforderlich
 - **Tool Calling** — unterstützt das Anthropic-Tool-Calling-Format
 - **SSE Streaming** — Streaming-Antworten werden unterstützt
+
+## v1.62 Änderungen
+
+### Fehlerbehebungen
+
+- **Worker-Streaming-Tool-Aufruf-Absturz behoben (fehlender sseEvent-Import)** — `handleStream` in `worker.js` rief `sseEvent()` auf, um Tool-Aufruf-SSE-Events zu senden, aber die Funktion wurde nie importiert, wodurch alle Streaming-Antworten mit `<TOOL_CALL>` auf Cloudflare Workers mit `ReferenceError` abstürzten. `sseEvent` wurde zur Importliste hinzugefügt.
+- **Ungenutzten `blocksToString`-Dead-Import entfernt** — Der ungenutzte `blocksToString`-Import wurde aus `worker.js` entfernt.
 
 ## v1.61 Änderungen
 
