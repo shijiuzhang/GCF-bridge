@@ -387,7 +387,10 @@ export default {
     }
 
     const url = new URL(request.url);
-    const path = url.pathname;
+    let path = url.pathname;
+    if (path.startsWith("/v1/v1/")) {
+      path = path.slice(3);
+    }
 
     if (path === "/" && request.method === "GET") {
       return jsonResp({ status: "ok", version: "1.0.0", models: Object.keys(MODELS) });

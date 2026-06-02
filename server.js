@@ -232,10 +232,15 @@ const server = http.createServer(async (req, res) => {
     res.writeHead(204, corsHeaders());
     return res.end();
   }
-  if (req.method === "GET" && req.url === "/") {
+  let path = req.url.split("?")[0];
+  if (path.startsWith("/v1/v1/")) {
+    path = path.slice(3);
+  }
+
+  if (req.method === "GET" && path === "/") {
     return jsonResp(res, { status: "ok", version: "1.0.0", models: Object.keys(MODELS) });
   }
-  if (req.method === "GET" && (req.url === "/v1/models" || req.url === "/v1beta/models")) {
+  if (req.method === "GET" && (path === "/v1/models" || path === "/v1beta/models")) {
     const anthropicModels = [
       { id: "claude-3-5-sonnet-20241022", display_name: "Claude 3.5 Sonnet", desc: "Claude 3.5 Sonnet" },
       { id: "claude-3-5-sonnet-latest", display_name: "Claude 3.5 Sonnet (Latest)", desc: "Claude 3.5 Sonnet" },
@@ -276,13 +281,13 @@ const server = http.createServer(async (req, res) => {
       last_id: list[list.length - 1]?.id
     });
   }
-  if (req.method === "POST" && req.url === "/v1/messages/count_tokens") {
+  if (req.method === "POST" && path === "/v1/messages/count_tokens") {
     return jsonResp(res, { input_tokens: 100 });
   }
   if (req.method === "POST") {
     const body = await readBody(req);
-    if (req.url === "/v1/messages") return sendMessagesHandler(res, body);
-    if (req.url === "/v1/chat/completions") return handleChatCompletions(res, body);
+    if (path === "/v1/messages") return sendMessagesHandler(res, body);
+    if (path === "/v1/chat/completions") return handleChatCompletions(res, body);
   }
   jsonResp(res, { error: "not found" }, 404);
 });
