@@ -104,7 +104,7 @@ async function handleAnthropicMessages(request, env) {
   prompt = prompt.replace(/\n{3,}/g, "\n\n").trim();
 
   if (stream) {
-    return sseResp(handleStream(modelInfo, prompt, msgId, session, sessionId, env));
+    return sseResp(createStream(modelInfo, prompt, msgId, session, sessionId, env));
   }
 
   try {
@@ -129,6 +129,22 @@ async function handleAnthropicMessages(request, env) {
   }
 }
 
+function createStream(modelInfo, prompt, msgId, session, sessionId, env) {
+  const encoder = new TextEncoder();
+  return new ReadableStream({
+    async start(controller) {
+      try {
+        for await (const chunk of handleStream(modelInfo, prompt, msgId, session, sessionId, env)) {
+          controller.enqueue(encoder.encode(chunk));
+        }
+      } catch (e) {
+        controller.error(e);
+      }
+      controller.close();
+    },
+  });
+}
+
 async function* handleStream(modelInfo, prompt, msgId, session, sessionId, env) {
   yield openSseEvents(msgId, modelInfo.name);
   yield contentBlockStart(0);
@@ -142,7 +158,7 @@ async function* handleStream(modelInfo, prompt, msgId, session, sessionId, env) 
   } catch {
     const raw = await sendToGemini(prompt, modelInfo.mode, modelInfo.think);
     fullText = extractResponseText(raw);
-    if (fullText && !fullText.includes(fullText.slice(0, 50))) yield contentBlockDelta(0, fullText);
+    if (fullText) yield contentBlockDelta(0, fullText);
   }
 
   yield contentBlockStop(0);
@@ -187,7 +203,6 @@ async function handleChatCompletions(request) {
     const encoder = new TextEncoder();
     const stream = new ReadableStream({
       async start(controller) {
-        let prevLen = 0;
         try {
           for await (const chunk of streamGeminiResponse(prompt, modelInfo.mode, modelInfo.think)) {
             const data = {

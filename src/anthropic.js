@@ -93,18 +93,40 @@ function repairToolJson(raw) {
   throw new Error("Could not parse tool JSON");
 }
 
+function extractToolCallJson(text) {
+  const startIdx = text.indexOf("{");
+  if (startIdx === -1) return null;
+  let depth = 0;
+  let inString = false;
+  let escape = false;
+  for (let i = startIdx; i < text.length; i++) {
+    const ch = text[i];
+    if (escape) { escape = false; continue; }
+    if (ch === "\\") { escape = true; continue; }
+    if (ch === '"') { inString = !inString; continue; }
+    if (inString) continue;
+    if (ch === "{") depth++;
+    else if (ch === "}") {
+      depth--;
+      if (depth === 0) return text.slice(startIdx, i + 1);
+    }
+  }
+  return null;
+}
+
 function parseToolCalls(text) {
   const blocks = [];
-  const clean = text.replace(/<TOOL_CALL>\s*(\{.*?\})\s*<\/TOOL_CALL>/gsi, (match, json) => {
+  const tagPattern = /<TOOL_CALL>([\s\S]*?)<\/TOOL_CALL>/gi;
+  const clean = text.replace(tagPattern, (match, inner) => {
     try {
-      const tool = repairToolJson(json);
-      if (tool.input && typeof tool.input === "object") {
-        for (const k of ["command", "content", "new_string", "old_string", "file_path"]) {
-          if (tool.input[k] && typeof tool.input[k] === "string") {
-            tool.input[k] = tool.input[k].replace(/\\"/g, '"').replace(/\\n/g, "\n");
-          }
-        }
+      let jsonStr = inner.trim();
+      if (!jsonStr.startsWith("{")) {
+        const braceIdx = jsonStr.indexOf("{");
+        if (braceIdx !== -1) jsonStr = jsonStr.slice(braceIdx);
       }
+      let jsonPart = extractToolCallJson(jsonStr);
+      if (!jsonPart) jsonPart = jsonStr;
+      const tool = repairToolJson(jsonPart);
       blocks.push({ type: "tool_use", id: generateToolId(), name: tool.name, input: tool.input || {} });
     } catch {}
     return "";
@@ -147,7 +169,7 @@ function contentBlockStart(index) {
 }
 
 function contentBlockDelta(index, text) {
-  return sseEvent("content_block_delta", { index, delta: { type: "text_delta", text }, usage: { output_tokens: 1 } });
+  return sseEvent("content_block_delta", { index, delta: { type: "text_delta", text } });
 }
 
 function contentBlockStop(index) {

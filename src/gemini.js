@@ -136,6 +136,29 @@ async function* streamGeminiResponse(prompt, modelMode, thinkMode) {
       } catch {}
     }
   }
+  if (buf.trim() && buf.includes('"wrb.fr"') && buf.length > 200) {
+    try {
+      const arr = JSON.parse(buf);
+      const innerStr = arr[0][2];
+      if (innerStr && innerStr.length > 50) {
+        const inner2 = JSON.parse(innerStr);
+        if (Array.isArray(inner2) && inner2.length > 4 && inner2[4]) {
+          for (const part of inner2[4]) {
+            if (Array.isArray(part) && part.length > 1 && part[1] && Array.isArray(part[1])) {
+              for (const t of part[1]) {
+                if (typeof t === "string" && t.length > prevText.length) {
+                  const delta = t.slice(prevText.length);
+                  const cleaned = cleanText(delta);
+                  if (cleaned) yield cleaned;
+                  prevText = t;
+                }
+              }
+            }
+          }
+        }
+      }
+    } catch {}
+  }
 }
 
 function cleanText(text) {
