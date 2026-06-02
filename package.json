@@ -1,0 +1,17 @@
+{
+  "name": "gcf-bridge",
+  "version": "1.0.0",
+  "description": "Gemini Web → Anthropic API proxy for Cloudflare Workers",
+  "main": "src/worker.js",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  },
+  "author": "",
+  "license": "MIT"
+}

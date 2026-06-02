@@ -1,0 +1,13 @@
+name = "gcf-bridge"
+main = "src/worker.js"
+compatibility_date = "2024-01-01"
+
+[[kv_namespaces]]
+binding = "SESSION_KV"
+id = "YOUR_KV_NAMESPACE_ID"
+
+[vars]
+GEMINI_BL = "boq_assistant-bard-web-server_20260525.09_p0"
+DEFAULT_MODEL = "gemini-3.5-flash"
+DEFAULT_MODE = "1"
+DEFAULT_THINK = "4"
