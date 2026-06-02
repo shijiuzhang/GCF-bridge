@@ -77,11 +77,16 @@ async function handleAnthropicMessages(request, env) {
   const deltaBlocks = computeDelta(session.lastBlocks, currentSigs);
   session.lastBlocks = currentSigs;
 
+  console.log(`[GCF BRIDGE] messages.length=${messages.length} lastMsgRole=${lastMsg.role}`);
+  console.log(`[GCF BRIDGE] session.lastBlocks=${JSON.stringify(session.lastBlocks)}`);
+  console.log(`[GCF BRIDGE] currentSigs=${JSON.stringify(currentSigs)}`);
+  console.log(`[GCF BRIDGE] deltaBlocks=${JSON.stringify(deltaBlocks)}`);
+
   if (!deltaBlocks.length) {
     if (session.pendingToolIds.length && session.toolRedeliveryCount < MAX_TOOL_REDELIVERY) {
       session.toolRedeliveryCount++;
       await saveSession(env, sessionId, session);
-      const respObj = session.lastToolResponse || { id: msgId, type: "message", role: "assistant", content: [{ type: "text", text: "Standing by." }], model: modelInfo.name, stop_reason: "end_turn", usage: { input_tokens: 0, output_tokens: 0 } };
+      const respObj = session.lastToolResponse || session.lastResponse || { id: msgId, type: "message", role: "assistant", content: [{ type: "text", text: "Standing by." }], model: modelInfo.name, stop_reason: "end_turn", usage: { input_tokens: 0, output_tokens: 0 } };
       if (stream) {
         return sseResp(createStaticStream(respObj));
       }
@@ -90,7 +95,7 @@ async function handleAnthropicMessages(request, env) {
     session.pendingToolIds = [];
     session.toolRedeliveryCount = 0;
     await saveSession(env, sessionId, session);
-    const respObj = { id: msgId, type: "message", role: "assistant", content: [{ type: "text", text: "Standing by." }], model: modelInfo.name, stop_reason: "end_turn", usage: { input_tokens: 0, output_tokens: 0 } };
+    const respObj = session.lastResponse || { id: msgId, type: "message", role: "assistant", content: [{ type: "text", text: "Standing by." }], model: modelInfo.name, stop_reason: "end_turn", usage: { input_tokens: 0, output_tokens: 0 } };
     if (stream) {
       return sseResp(createStaticStream(respObj));
     }
@@ -139,6 +144,7 @@ async function handleAnthropicMessages(request, env) {
       session.pendingToolIds = [];
       session.lastToolResponse = null;
     }
+    session.lastResponse = result;
     session.messageCount++;
     await saveSession(env, sessionId, session);
 
@@ -246,21 +252,24 @@ async function* handleStream(modelInfo, prompt, msgId, session, sessionId, env) 
   yield messageStop();
   yield "data: [DONE]\n\n";
 
+  const finalResponse = {
+    id: msgId,
+    type: "message",
+    role: "assistant",
+    content: [
+      ...(cleanTextContent ? [{ type: "text", text: cleanTextContent }] : []),
+      ...toolBlocks
+    ],
+    model: modelInfo.name,
+    stop_reason: stopReason,
+    usage: { input_tokens: 100, output_tokens: 100 }
+  };
+  session.lastResponse = finalResponse;
+
   if (toolBlocks.length) {
     session.pendingToolIds = toolBlocks.map(b => b.id);
     session.toolRedeliveryCount = 0;
-    session.lastToolResponse = {
-      id: msgId,
-      type: "message",
-      role: "assistant",
-      content: [
-        ...(cleanTextContent ? [{ type: "text", text: cleanTextContent }] : []),
-        ...toolBlocks
-      ],
-      model: modelInfo.name,
-      stop_reason: "tool_use",
-      usage: { input_tokens: 100, output_tokens: 100 }
-    };
+    session.lastToolResponse = finalResponse;
   } else {
     session.pendingToolIds = [];
     session.lastToolResponse = null;

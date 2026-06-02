@@ -1,0 +1,1707 @@
+{
+  "wallTime": 4099,
+  "cpuTime": 1,
+  "truncated": false,
+  "executionModel": "stateless",
+  "outcome": "ok",
+  "scriptVersion": {
+    "id": "214aacd5-4d5e-4664-a4f6-184eaadcfde1"
+  },
+  "scriptName": "gcf-bridge",
+  "diagnosticsChannelEvents": [],
+  "exceptions": [],
+  "logs": [],
+  "eventTimestamp": 1780412869207,
+  "event": {
+    "request": {
+      "url": "https://gcf-bridge.zhangyu76.workers.dev/v1/v1/messages?beta=true",
+      "method": "POST",
+      "headers": {
+        "accept": "*/*",
+        "accept-encoding": "gzip, br",
+        "cf-connecting-ip": "203.10.98.186",
+        "cf-ipcountry": "JP",
+        "cf-ray": "a0575eb08c15e8c6",
+        "cf-visitor": "{\"scheme\":\"https\"}",
+        "connection": "Keep-Alive",
+        "content-length": "103",
+        "content-type": "application/json",
+        "host": "gcf-bridge.zhangyu76.workers.dev",
+        "user-agent": "curl/8.7.1",
+        "x-api-key": "REDACTED",
+        "x-forwarded-proto": "https",
+        "x-real-ip": "203.10.98.186"
+      },
+      "cf": {
+        "httpProtocol": "HTTP/2",
+        "requestPriority": "weight=16;exclusive=0;group=0;group-weight=0",
+        "edgeRequestKeepAliveStatus": 1,
+        "requestHeaderNames": {},
+        "clientTcpRtt": 0,
+        "clientQuicRtt": 0,
+        "colo": "NRT",
+        "asn": 137409,
+        "asOrganization": "GSL Networks Pty LTD - Tokyo",
+        "country": "JP",
+        "isEUCountry": false,
+        "city": "Tokyo",
+        "continent": "AS",
+        "region": "Tokyo",
+        "regionCode": "13",
+        "timezone": "Asia/Tokyo",
+        "longitude": "139.69171",
+        "latitude": "35.6895",
+        "postalCode": "101-8656",
+        "tlsVersion": "TLSv1.3",
+        "tlsCipher": "AEAD-CHACHA20-POLY1305-SHA256",
+        "tlsClientRandom": "emXODSOBcyiDmkIl7+r95GS/EbE6j/SE3GjbVl0nbKA=",
+        "tlsClientCiphersSha1": "eDGmD1H99AwNYzOR+7eoGLo6eLU=",
+        "tlsClientExtensionsSha1": "Ub+nUmIm1U57hdNSUph0R+kx9Gc=",
+        "tlsClientExtensionsSha1Le": "NMNf2YIpLBhtroOEBooGFi+jtJ8=",
+        "tlsExportedAuthenticator": {
+          "clientHandshake": "3e29b1afc38ffca18364dfd386787df2207b1f90c6e878538311bab6a447b0e6",
+          "serverHandshake": "331f1fc0845862ddd31113e584c7b1a8345c54f184b2987d3086b158cfd25776",
+          "clientFinished": "4991c72c14d23fa3f8187332c31d044293e318b8f9e32079111c68b4197c60a9",
+          "serverFinished": "b1dd7e9868cccb9dd9b69e187079021fe1b1303e02b0bac54ac6b6d050e9bf10"
+        },
+        "tlsClientHelloLength": "333",
+        "tlsClientAuth": {
+          "certPresented": "0",
+          "certVerified": "NONE",
+          "certRevoked": "0",
+          "certIssuerDN": "",
+          "certSubjectDN": "",
+          "certIssuerDNRFC2253": "",
+          "certSubjectDNRFC2253": "",
+          "certIssuerDNLegacy": "",
+          "certSubjectDNLegacy": "",
+          "certSerial": "",
+          "certIssuerSerial": "",
+          "certSKI": "",
+          "certIssuerSKI": "",
+          "certFingerprintSHA1": "",
+          "certFingerprintSHA256": "",
+          "certNotBefore": "",
+          "certNotAfter": "",
+          "certRFC9440": "",
+          "certRFC9440TooLarge": false,
+          "certChainRFC9440": "",
+          "certChainRFC9440TooLarge": false
+        },
+        "verifiedBotCategory": "",
+        "edgeL4": {
+          "deliveryRate": 5590733
+        }
+      }
+    },
+    "response": {
+      "status": 200
+    }
+  }
+}
+{
+  "wallTime": 5091,
+  "cpuTime": 12,
+  "truncated": false,
+  "executionModel": "stateless",
+  "outcome": "ok",
+  "scriptVersion": {
+    "id": "214aacd5-4d5e-4664-a4f6-184eaadcfde1"
+  },
+  "scriptName": "gcf-bridge",
+  "diagnosticsChannelEvents": [],
+  "exceptions": [],
+  "logs": [],
+  "eventTimestamp": 1780412999146,
+  "event": {
+    "request": {
+      "url": "https://gcf-bridge.zhangyu76.workers.dev/v1/v1/messages?beta=true",
+      "method": "POST",
+      "headers": {
+        "accept": "application/json",
+        "accept-encoding": "gzip, br",
+        "anthropic-beta": "claude-code-20250219,prompt-caching-scope-2026-01-05",
+        "anthropic-dangerous-direct-browser-access": "true",
+        "anthropic-version": "2023-06-01",
+        "authorization": "REDACTED",
+        "cf-connecting-ip": "203.10.98.186",
+        "cf-ipcountry": "JP",
+        "cf-ray": "a05761db5830bf9f",
+        "cf-visitor": "{\"scheme\":\"https\"}",
+        "connection": "Keep-Alive",
+        "content-length": "104273",
+        "content-type": "application/json",
+        "host": "gcf-bridge.zhangyu76.workers.dev",
+        "user-agent": "claude-cli/2.1.150 (external, sdk-cli)",
+        "x-app": "cli",
+        "x-claude-code-session-id": "86cc540f-00a6-46eb-8800-c248aecaaf34",
+        "x-forwarded-proto": "https",
+        "x-real-ip": "203.10.98.186",
+        "x-stainless-arch": "arm64",
+        "x-stainless-lang": "js",
+        "x-stainless-os": "MacOS",
+        "x-stainless-package-version": "0.94.0",
+        "x-stainless-retry-count": "0",
+        "x-stainless-runtime": "node",
+        "x-stainless-runtime-version": "v24.3.0",
+        "x-stainless-timeout": "600"
+      },
+      "cf": {
+        "httpProtocol": "HTTP/1.1",
+        "clientAcceptEncoding": "gzip, deflate, br",
+        "requestPriority": "",
+        "edgeRequestKeepAliveStatus": 1,
+        "requestHeaderNames": {},
+        "clientTcpRtt": 0,
+        "clientQuicRtt": 0,
+        "colo": "NRT",
+        "asn": 137409,
+        "asOrganization": "GSL Networks Pty LTD - Tokyo",
+        "country": "JP",
+        "isEUCountry": false,
+        "city": "Tokyo",
+        "continent": "AS",
+        "region": "Tokyo",
+        "regionCode": "13",
+        "timezone": "Asia/Tokyo",
+        "longitude": "139.69171",
+        "latitude": "35.6895",
+        "postalCode": "101-8656",
+        "tlsVersion": "TLSv1.3",
+        "tlsCipher": "AEAD-AES128-GCM-SHA256",
+        "tlsClientRandom": "bH4XfgL9TdflQmeRIDtJBjXw8Kv2bl7FslHZil79lzA=",
+        "tlsClientCiphersSha1": "z756bn+x21PiebYy319nCdFpEYo=",
+        "tlsClientExtensionsSha1": "WWbSthm5fX2IyMecDOgDUYNG42M=",
+        "tlsClientExtensionsSha1Le": "x3C9wOJ4WRKMb/1vBgvNLe8J+Ok=",
+        "tlsExportedAuthenticator": {
+          "clientHandshake": "10c6eace763eed8796b9ad29e3c6dc3708d42c3bcdc42bd84d970da4a15ab072",
+          "serverHandshake": "671bb0e58e7832321405ae07a846a281b853a5f687c24af3560fbdb403aea65a",
+          "clientFinished": "f1ccee3f386abb9072e646b423d1bb0a851bf5428b247c3160d763a18c50aabb",
+          "serverFinished": "c337558b8e38ae83a64b7533505a01239817a285b1280714e27f1b47b4437e53"
+        },
+        "tlsClientHelloLength": "508",
+        "tlsClientAuth": {
+          "certPresented": "0",
+          "certVerified": "NONE",
+          "certRevoked": "0",
+          "certIssuerDN": "",
+          "certSubjectDN": "",
+          "certIssuerDNRFC2253": "",
+          "certSubjectDNRFC2253": "",
+          "certIssuerDNLegacy": "",
+          "certSubjectDNLegacy": "",
+          "certSerial": "",
+          "certIssuerSerial": "",
+          "certSKI": "",
+          "certIssuerSKI": "",
+          "certFingerprintSHA1": "",
+          "certFingerprintSHA256": "",
+          "certNotBefore": "",
+          "certNotAfter": "",
+          "certRFC9440": "",
+          "certRFC9440TooLarge": false,
+          "certChainRFC9440": "",
+          "certChainRFC9440TooLarge": false
+        },
+        "verifiedBotCategory": "",
+        "edgeL4": {
+          "deliveryRate": 8369942
+        }
+      }
+    },
+    "response": {
+      "status": 200
+    }
+  }
+}
+{
+  "wallTime": 4839,
+  "cpuTime": 7,
+  "truncated": false,
+  "executionModel": "stateless",
+  "outcome": "ok",
+  "scriptVersion": {
+    "id": "214aacd5-4d5e-4664-a4f6-184eaadcfde1"
+  },
+  "scriptName": "gcf-bridge",
+  "diagnosticsChannelEvents": [],
+  "exceptions": [],
+  "logs": [],
+  "eventTimestamp": 1780413005842,
+  "event": {
+    "request": {
+      "url": "https://gcf-bridge.zhangyu76.workers.dev/v1/v1/messages?beta=true",
+      "method": "POST",
+      "headers": {
+        "accept": "application/json",
+        "accept-encoding": "gzip, br",
+        "anthropic-beta": "claude-code-20250219,prompt-caching-scope-2026-01-05",
+        "anthropic-dangerous-direct-browser-access": "true",
+        "anthropic-version": "2023-06-01",
+        "authorization": "REDACTED",
+        "cf-connecting-ip": "203.10.98.186",
+        "cf-ipcountry": "JP",
+        "cf-ray": "a05761feb8d5bf9f",
+        "cf-visitor": "{\"scheme\":\"https\"}",
+        "connection": "Keep-Alive",
+        "content-length": "104259",
+        "content-type": "application/json",
+        "host": "gcf-bridge.zhangyu76.workers.dev",
+        "user-agent": "claude-cli/2.1.150 (external, sdk-cli)",
+        "x-app": "cli",
+        "x-claude-code-session-id": "86cc540f-00a6-46eb-8800-c248aecaaf34",
+        "x-forwarded-proto": "https",
+        "x-real-ip": "203.10.98.186",
+        "x-stainless-arch": "arm64",
+        "x-stainless-lang": "js",
+        "x-stainless-os": "MacOS",
+        "x-stainless-package-version": "0.94.0",
+        "x-stainless-retry-count": "0",
+        "x-stainless-runtime": "node",
+        "x-stainless-runtime-version": "v24.3.0",
+        "x-stainless-timeout": "600"
+      },
+      "cf": {
+        "httpProtocol": "HTTP/1.1",
+        "clientAcceptEncoding": "gzip, deflate, br",
+        "requestPriority": "",
+        "edgeRequestKeepAliveStatus": 1,
+        "requestHeaderNames": {},
+        "clientTcpRtt": 0,
+        "clientQuicRtt": 0,
+        "colo": "NRT",
+        "asn": 137409,
+        "asOrganization": "GSL Networks Pty LTD - Tokyo",
+        "country": "JP",
+        "isEUCountry": false,
+        "city": "Tokyo",
+        "continent": "AS",
+        "region": "Tokyo",
+        "regionCode": "13",
+        "timezone": "Asia/Tokyo",
+        "longitude": "139.69171",
+        "latitude": "35.6895",
+        "postalCode": "101-8656",
+        "tlsVersion": "TLSv1.3",
+        "tlsCipher": "AEAD-AES128-GCM-SHA256",
+        "tlsClientRandom": "bH4XfgL9TdflQmeRIDtJBjXw8Kv2bl7FslHZil79lzA=",
+        "tlsClientCiphersSha1": "z756bn+x21PiebYy319nCdFpEYo=",
+        "tlsClientExtensionsSha1": "WWbSthm5fX2IyMecDOgDUYNG42M=",
+        "tlsClientExtensionsSha1Le": "x3C9wOJ4WRKMb/1vBgvNLe8J+Ok=",
+        "tlsExportedAuthenticator": {
+          "clientHandshake": "10c6eace763eed8796b9ad29e3c6dc3708d42c3bcdc42bd84d970da4a15ab072",
+          "serverHandshake": "671bb0e58e7832321405ae07a846a281b853a5f687c24af3560fbdb403aea65a",
+          "clientFinished": "f1ccee3f386abb9072e646b423d1bb0a851bf5428b247c3160d763a18c50aabb",
+          "serverFinished": "c337558b8e38ae83a64b7533505a01239817a285b1280714e27f1b47b4437e53"
+        },
+        "tlsClientHelloLength": "508",
+        "tlsClientAuth": {
+          "certPresented": "0",
+          "certVerified": "NONE",
+          "certRevoked": "0",
+          "certIssuerDN": "",
+          "certSubjectDN": "",
+          "certIssuerDNRFC2253": "",
+          "certSubjectDNRFC2253": "",
+          "certIssuerDNLegacy": "",
+          "certSubjectDNLegacy": "",
+          "certSerial": "",
+          "certIssuerSerial": "",
+          "certSKI": "",
+          "certIssuerSKI": "",
+          "certFingerprintSHA1": "",
+          "certFingerprintSHA256": "",
+          "certNotBefore": "",
+          "certNotAfter": "",
+          "certRFC9440": "",
+          "certRFC9440TooLarge": false,
+          "certChainRFC9440": "",
+          "certChainRFC9440TooLarge": false
+        },
+        "verifiedBotCategory": "",
+        "edgeL4": {
+          "deliveryRate": 8369942
+        }
+      }
+    },
+    "response": {
+      "status": 200
+    }
+  }
+}
+{
+  "wallTime": 6334,
+  "cpuTime": 8,
+  "truncated": false,
+  "executionModel": "stateless",
+  "outcome": "ok",
+  "scriptVersion": {
+    "id": "214aacd5-4d5e-4664-a4f6-184eaadcfde1"
+  },
+  "scriptName": "gcf-bridge",
+  "diagnosticsChannelEvents": [],
+  "exceptions": [],
+  "logs": [],
+  "eventTimestamp": 1780413127551,
+  "event": {
+    "request": {
+      "url": "https://gcf-bridge.zhangyu76.workers.dev/v1/v1/messages?beta=true",
+      "method": "POST",
+      "headers": {
+        "accept": "application/json",
+        "accept-encoding": "gzip, br",
+        "anthropic-beta": "claude-code-20250219,prompt-caching-scope-2026-01-05",
+        "anthropic-dangerous-direct-browser-access": "true",
+        "anthropic-version": "2023-06-01",
+        "authorization": "REDACTED",
+        "cf-connecting-ip": "203.10.98.186",
+        "cf-ipcountry": "JP",
+        "cf-ray": "a05764fa1854d771",
+        "cf-visitor": "{\"scheme\":\"https\"}",
+        "connection": "Keep-Alive",
+        "content-length": "100801",
+        "content-type": "application/json",
+        "host": "gcf-bridge.zhangyu76.workers.dev",
+        "user-agent": "claude-cli/2.1.150 (external, cli)",
+        "x-app": "cli",
+        "x-claude-code-session-id": "776f0fd8-c2b9-4681-be40-6b431df07bea",
+        "x-forwarded-proto": "https",
+        "x-real-ip": "203.10.98.186",
+        "x-stainless-arch": "arm64",
+        "x-stainless-lang": "js",
+        "x-stainless-os": "MacOS",
+        "x-stainless-package-version": "0.94.0",
+        "x-stainless-retry-count": "0",
+        "x-stainless-runtime": "node",
+        "x-stainless-runtime-version": "v24.3.0",
+        "x-stainless-timeout": "600"
+      },
+      "cf": {
+        "httpProtocol": "HTTP/1.1",
+        "clientAcceptEncoding": "gzip, deflate, br",
+        "requestPriority": "",
+        "edgeRequestKeepAliveStatus": 1,
+        "requestHeaderNames": {},
+        "clientTcpRtt": 0,
+        "clientQuicRtt": 0,
+        "colo": "NRT",
+        "asn": 137409,
+        "asOrganization": "GSL Networks Pty LTD - Tokyo",
+        "country": "JP",
+        "isEUCountry": false,
+        "city": "Tokyo",
+        "continent": "AS",
+        "region": "Tokyo",
+        "regionCode": "13",
+        "timezone": "Asia/Tokyo",
+        "longitude": "139.69171",
+        "latitude": "35.6895",
+        "postalCode": "101-8656",
+        "tlsVersion": "TLSv1.3",
+        "tlsCipher": "AEAD-AES128-GCM-SHA256",
+        "tlsClientRandom": "fujZZBWKqPWjKuCzLjn+mubHuIo6UiVLKDMXjBZkvs4=",
+        "tlsClientCiphersSha1": "z756bn+x21PiebYy319nCdFpEYo=",
+        "tlsClientExtensionsSha1": "WWbSthm5fX2IyMecDOgDUYNG42M=",
+        "tlsClientExtensionsSha1Le": "x3C9wOJ4WRKMb/1vBgvNLe8J+Ok=",
+        "tlsExportedAuthenticator": {
+          "clientHandshake": "885d1a30149613489f022e871a0e725b3dfd3b82b4140cb5928251d3ef0d8ce8",
+          "serverHandshake": "c9271f7083f4b39e2c5857a04fe0ba79fbfa94889801fb94acfb51ea5c3ebf10",
+          "clientFinished": "d9bed80be7e54a2e1f0d95f45ffca4d6ca8d0f67e6506f47aff9297fb00f9f9f",
+          "serverFinished": "f979e39f4d4ea5fe52aa975cdedaea077c3812b70b1c233153405e4bb002b594"
+        },
+        "tlsClientHelloLength": "508",
+        "tlsClientAuth": {
+          "certPresented": "0",
+          "certVerified": "NONE",
+          "certRevoked": "0",
+          "certIssuerDN": "",
+          "certSubjectDN": "",
+          "certIssuerDNRFC2253": "",
+          "certSubjectDNRFC2253": "",
+          "certIssuerDNLegacy": "",
+          "certSubjectDNLegacy": "",
+          "certSerial": "",
+          "certIssuerSerial": "",
+          "certSKI": "",
+          "certIssuerSKI": "",
+          "certFingerprintSHA1": "",
+          "certFingerprintSHA256": "",
+          "certNotBefore": "",
+          "certNotAfter": "",
+          "certRFC9440": "",
+          "certRFC9440TooLarge": false,
+          "certChainRFC9440": "",
+          "certChainRFC9440TooLarge": false
+        },
+        "verifiedBotCategory": "",
+        "edgeL4": {
+          "deliveryRate": 4572631
+        }
+      }
+    },
+    "response": {
+      "status": 200
+    }
+  }
+}
+{
+  "wallTime": 4990,
+  "cpuTime": 4,
+  "truncated": false,
+  "executionModel": "stateless",
+  "outcome": "ok",
+  "scriptVersion": {
+    "id": "214aacd5-4d5e-4664-a4f6-184eaadcfde1"
+  },
+  "scriptName": "gcf-bridge",
+  "diagnosticsChannelEvents": [],
+  "exceptions": [],
+  "logs": [],
+  "eventTimestamp": 1780413135201,
+  "event": {
+    "request": {
+      "url": "https://gcf-bridge.zhangyu76.workers.dev/v1/v1/messages?beta=true",
+      "method": "POST",
+      "headers": {
+        "accept": "application/json",
+        "accept-encoding": "gzip, br",
+        "anthropic-beta": "claude-code-20250219,prompt-caching-scope-2026-01-05",
+        "anthropic-dangerous-direct-browser-access": "true",
+        "anthropic-version": "2023-06-01",
+        "authorization": "REDACTED",
+        "cf-connecting-ip": "203.10.98.186",
+        "cf-ipcountry": "JP",
+        "cf-ray": "a057652978e2d771",
+        "cf-visitor": "{\"scheme\":\"https\"}",
+        "connection": "Keep-Alive",
+        "content-length": "100787",
+        "content-type": "application/json",
+        "host": "gcf-bridge.zhangyu76.workers.dev",
+        "user-agent": "claude-cli/2.1.150 (external, cli)",
+        "x-app": "cli",
+        "x-claude-code-session-id": "776f0fd8-c2b9-4681-be40-6b431df07bea",
+        "x-forwarded-proto": "https",
+        "x-real-ip": "203.10.98.186",
+        "x-stainless-arch": "arm64",
+        "x-stainless-lang": "js",
+        "x-stainless-os": "MacOS",
+        "x-stainless-package-version": "0.94.0",
+        "x-stainless-retry-count": "0",
+        "x-stainless-runtime": "node",
+        "x-stainless-runtime-version": "v24.3.0",
+        "x-stainless-timeout": "600"
+      },
+      "cf": {
+        "httpProtocol": "HTTP/1.1",
+        "clientAcceptEncoding": "gzip, deflate, br",
+        "requestPriority": "",
+        "edgeRequestKeepAliveStatus": 1,
+        "requestHeaderNames": {},
+        "clientTcpRtt": 0,
+        "clientQuicRtt": 0,
+        "colo": "NRT",
+        "asn": 137409,
+        "asOrganization": "GSL Networks Pty LTD - Tokyo",
+        "country": "JP",
+        "isEUCountry": false,
+        "city": "Tokyo",
+        "continent": "AS",
+        "region": "Tokyo",
+        "regionCode": "13",
+        "timezone": "Asia/Tokyo",
+        "longitude": "139.69171",
+        "latitude": "35.6895",
+        "postalCode": "101-8656",
+        "tlsVersion": "TLSv1.3",
+        "tlsCipher": "AEAD-AES128-GCM-SHA256",
+        "tlsClientRandom": "fujZZBWKqPWjKuCzLjn+mubHuIo6UiVLKDMXjBZkvs4=",
+        "tlsClientCiphersSha1": "z756bn+x21PiebYy319nCdFpEYo=",
+        "tlsClientExtensionsSha1": "WWbSthm5fX2IyMecDOgDUYNG42M=",
+        "tlsClientExtensionsSha1Le": "x3C9wOJ4WRKMb/1vBgvNLe8J+Ok=",
+        "tlsExportedAuthenticator": {
+          "clientHandshake": "885d1a30149613489f022e871a0e725b3dfd3b82b4140cb5928251d3ef0d8ce8",
+          "serverHandshake": "c9271f7083f4b39e2c5857a04fe0ba79fbfa94889801fb94acfb51ea5c3ebf10",
+          "clientFinished": "d9bed80be7e54a2e1f0d95f45ffca4d6ca8d0f67e6506f47aff9297fb00f9f9f",
+          "serverFinished": "f979e39f4d4ea5fe52aa975cdedaea077c3812b70b1c233153405e4bb002b594"
+        },
+        "tlsClientHelloLength": "508",
+        "tlsClientAuth": {
+          "certPresented": "0",
+          "certVerified": "NONE",
+          "certRevoked": "0",
+          "certIssuerDN": "",
+          "certSubjectDN": "",
+          "certIssuerDNRFC2253": "",
+          "certSubjectDNRFC2253": "",
+          "certIssuerDNLegacy": "",
+          "certSubjectDNLegacy": "",
+          "certSerial": "",
+          "certIssuerSerial": "",
+          "certSKI": "",
+          "certIssuerSKI": "",
+          "certFingerprintSHA1": "",
+          "certFingerprintSHA256": "",
+          "certNotBefore": "",
+          "certNotAfter": "",
+          "certRFC9440": "",
+          "certRFC9440TooLarge": false,
+          "certChainRFC9440": "",
+          "certChainRFC9440TooLarge": false
+        },
+        "verifiedBotCategory": "",
+        "edgeL4": {
+          "deliveryRate": 4572631
+        }
+      }
+    },
+    "response": {
+      "status": 200
+    }
+  }
+}
+{
+  "wallTime": 1,
+  "cpuTime": 0,
+  "truncated": false,
+  "executionModel": "stateless",
+  "outcome": "ok",
+  "scriptVersion": {
+    "id": "214aacd5-4d5e-4664-a4f6-184eaadcfde1"
+  },
+  "scriptName": "gcf-bridge",
+  "diagnosticsChannelEvents": [],
+  "exceptions": [],
+  "logs": [],
+  "eventTimestamp": 1780413153748,
+  "event": {
+    "request": {
+      "url": "https://gcf-bridge.zhangyu76.workers.dev/v1/v1/messages?beta=true",
+      "method": "POST",
+      "headers": {
+        "accept": "application/json",
+        "accept-encoding": "gzip, br",
+        "anthropic-beta": "claude-code-20250219,prompt-caching-scope-2026-01-05",
+        "anthropic-dangerous-direct-browser-access": "true",
+        "anthropic-version": "2023-06-01",
+        "authorization": "REDACTED",
+        "cf-connecting-ip": "203.10.98.186",
+        "cf-ipcountry": "JP",
+        "cf-ray": "a05765a2ece6d771",
+        "cf-visitor": "{\"scheme\":\"https\"}",
+        "connection": "Keep-Alive",
+        "content-length": "1733",
+        "content-type": "application/json",
+        "host": "gcf-bridge.zhangyu76.workers.dev",
+        "user-agent": "claude-cli/2.1.150 (external, cli)",
+        "x-app": "cli",
+        "x-claude-code-session-id": "776f0fd8-c2b9-4681-be40-6b431df07bea",
+        "x-forwarded-proto": "https",
+        "x-real-ip": "203.10.98.186",
+        "x-stainless-arch": "arm64",
+        "x-stainless-lang": "js",
+        "x-stainless-os": "MacOS",
+        "x-stainless-package-version": "0.94.0",
+        "x-stainless-retry-count": "0",
+        "x-stainless-runtime": "node",
+        "x-stainless-runtime-version": "v24.3.0",
+        "x-stainless-timeout": "600"
+      },
+      "cf": {
+        "httpProtocol": "HTTP/1.1",
+        "clientAcceptEncoding": "gzip, deflate, br",
+        "requestPriority": "",
+        "edgeRequestKeepAliveStatus": 1,
+        "requestHeaderNames": {},
+        "clientTcpRtt": 0,
+        "clientQuicRtt": 0,
+        "colo": "NRT",
+        "asn": 137409,
+        "asOrganization": "GSL Networks Pty LTD - Tokyo",
+        "country": "JP",
+        "isEUCountry": false,
+        "city": "Tokyo",
+        "continent": "AS",
+        "region": "Tokyo",
+        "regionCode": "13",
+        "timezone": "Asia/Tokyo",
+        "longitude": "139.69171",
+        "latitude": "35.6895",
+        "postalCode": "101-8656",
+        "tlsVersion": "TLSv1.3",
+        "tlsCipher": "AEAD-AES128-GCM-SHA256",
+        "tlsClientRandom": "fujZZBWKqPWjKuCzLjn+mubHuIo6UiVLKDMXjBZkvs4=",
+        "tlsClientCiphersSha1": "z756bn+x21PiebYy319nCdFpEYo=",
+        "tlsClientExtensionsSha1": "WWbSthm5fX2IyMecDOgDUYNG42M=",
+        "tlsClientExtensionsSha1Le": "x3C9wOJ4WRKMb/1vBgvNLe8J+Ok=",
+        "tlsExportedAuthenticator": {
+          "clientHandshake": "885d1a30149613489f022e871a0e725b3dfd3b82b4140cb5928251d3ef0d8ce8",
+          "serverHandshake": "c9271f7083f4b39e2c5857a04fe0ba79fbfa94889801fb94acfb51ea5c3ebf10",
+          "clientFinished": "d9bed80be7e54a2e1f0d95f45ffca4d6ca8d0f67e6506f47aff9297fb00f9f9f",
+          "serverFinished": "f979e39f4d4ea5fe52aa975cdedaea077c3812b70b1c233153405e4bb002b594"
+        },
+        "tlsClientHelloLength": "508",
+        "tlsClientAuth": {
+          "certPresented": "0",
+          "certVerified": "NONE",
+          "certRevoked": "0",
+          "certIssuerDN": "",
+          "certSubjectDN": "",
+          "certIssuerDNRFC2253": "",
+          "certSubjectDNRFC2253": "",
+          "certIssuerDNLegacy": "",
+          "certSubjectDNLegacy": "",
+          "certSerial": "",
+          "certIssuerSerial": "",
+          "certSKI": "",
+          "certIssuerSKI": "",
+          "certFingerprintSHA1": "",
+          "certFingerprintSHA256": "",
+          "certNotBefore": "",
+          "certNotAfter": "",
+          "certRFC9440": "",
+          "certRFC9440TooLarge": false,
+          "certChainRFC9440": "",
+          "certChainRFC9440TooLarge": false
+        },
+        "verifiedBotCategory": "",
+        "edgeL4": {
+          "deliveryRate": 4572631
+        }
+      }
+    },
+    "response": {
+      "status": 200
+    }
+  }
+}
+{
+  "wallTime": 1,
+  "cpuTime": 0,
+  "truncated": false,
+  "executionModel": "stateless",
+  "outcome": "ok",
+  "scriptVersion": {
+    "id": "214aacd5-4d5e-4664-a4f6-184eaadcfde1"
+  },
+  "scriptName": "gcf-bridge",
+  "diagnosticsChannelEvents": [],
+  "exceptions": [],
+  "logs": [],
+  "eventTimestamp": 1780413154229,
+  "event": {
+    "request": {
+      "url": "https://gcf-bridge.zhangyu76.workers.dev/v1/v1/messages?beta=true",
+      "method": "POST",
+      "headers": {
+        "accept": "application/json",
+        "accept-encoding": "gzip, br",
+        "anthropic-beta": "claude-code-20250219,prompt-caching-scope-2026-01-05",
+        "anthropic-dangerous-direct-browser-access": "true",
+        "anthropic-version": "2023-06-01",
+        "authorization": "REDACTED",
+        "cf-connecting-ip": "203.10.98.186",
+        "cf-ipcountry": "JP",
+        "cf-ray": "a05765a5eddad771",
+        "cf-visitor": "{\"scheme\":\"https\"}",
+        "connection": "Keep-Alive",
+        "content-length": "1719",
+        "content-type": "application/json",
+        "host": "gcf-bridge.zhangyu76.workers.dev",
+        "user-agent": "claude-cli/2.1.150 (external, cli)",
+        "x-app": "cli",
+        "x-claude-code-session-id": "776f0fd8-c2b9-4681-be40-6b431df07bea",
+        "x-forwarded-proto": "https",
+        "x-real-ip": "203.10.98.186",
+        "x-stainless-arch": "arm64",
+        "x-stainless-lang": "js",
+        "x-stainless-os": "MacOS",
+        "x-stainless-package-version": "0.94.0",
+        "x-stainless-retry-count": "0",
+        "x-stainless-runtime": "node",
+        "x-stainless-runtime-version": "v24.3.0",
+        "x-stainless-timeout": "600"
+      },
+      "cf": {
+        "httpProtocol": "HTTP/1.1",
+        "clientAcceptEncoding": "gzip, deflate, br",
+        "requestPriority": "",
+        "edgeRequestKeepAliveStatus": 1,
+        "requestHeaderNames": {},
+        "clientTcpRtt": 0,
+        "clientQuicRtt": 0,
+        "colo": "NRT",
+        "asn": 137409,
+        "asOrganization": "GSL Networks Pty LTD - Tokyo",
+        "country": "JP",
+        "isEUCountry": false,
+        "city": "Tokyo",
+        "continent": "AS",
+        "region": "Tokyo",
+        "regionCode": "13",
+        "timezone": "Asia/Tokyo",
+        "longitude": "139.69171",
+        "latitude": "35.6895",
+        "postalCode": "101-8656",
+        "tlsVersion": "TLSv1.3",
+        "tlsCipher": "AEAD-AES128-GCM-SHA256",
+        "tlsClientRandom": "fujZZBWKqPWjKuCzLjn+mubHuIo6UiVLKDMXjBZkvs4=",
+        "tlsClientCiphersSha1": "z756bn+x21PiebYy319nCdFpEYo=",
+        "tlsClientExtensionsSha1": "WWbSthm5fX2IyMecDOgDUYNG42M=",
+        "tlsClientExtensionsSha1Le": "x3C9wOJ4WRKMb/1vBgvNLe8J+Ok=",
+        "tlsExportedAuthenticator": {
+          "clientHandshake": "885d1a30149613489f022e871a0e725b3dfd3b82b4140cb5928251d3ef0d8ce8",
+          "serverHandshake": "c9271f7083f4b39e2c5857a04fe0ba79fbfa94889801fb94acfb51ea5c3ebf10",
+          "clientFinished": "d9bed80be7e54a2e1f0d95f45ffca4d6ca8d0f67e6506f47aff9297fb00f9f9f",
+          "serverFinished": "f979e39f4d4ea5fe52aa975cdedaea077c3812b70b1c233153405e4bb002b594"
+        },
+        "tlsClientHelloLength": "508",
+        "tlsClientAuth": {
+          "certPresented": "0",
+          "certVerified": "NONE",
+          "certRevoked": "0",
+          "certIssuerDN": "",
+          "certSubjectDN": "",
+          "certIssuerDNRFC2253": "",
+          "certSubjectDNRFC2253": "",
+          "certIssuerDNLegacy": "",
+          "certSubjectDNLegacy": "",
+          "certSerial": "",
+          "certIssuerSerial": "",
+          "certSKI": "",
+          "certIssuerSKI": "",
+          "certFingerprintSHA1": "",
+          "certFingerprintSHA256": "",
+          "certNotBefore": "",
+          "certNotAfter": "",
+          "certRFC9440": "",
+          "certRFC9440TooLarge": false,
+          "certChainRFC9440": "",
+          "certChainRFC9440TooLarge": false
+        },
+        "verifiedBotCategory": "",
+        "edgeL4": {
+          "deliveryRate": 4572631
+        }
+      }
+    },
+    "response": {
+      "status": 200
+    }
+  }
+}
+{
+  "wallTime": 5335,
+  "cpuTime": 6,
+  "truncated": false,
+  "executionModel": "stateless",
+  "outcome": "ok",
+  "scriptVersion": {
+    "id": "214aacd5-4d5e-4664-a4f6-184eaadcfde1"
+  },
+  "scriptName": "gcf-bridge",
+  "diagnosticsChannelEvents": [],
+  "exceptions": [],
+  "logs": [],
+  "eventTimestamp": 1780413155028,
+  "event": {
+    "request": {
+      "url": "https://gcf-bridge.zhangyu76.workers.dev/v1/v1/messages?beta=true",
+      "method": "POST",
+      "headers": {
+        "accept": "application/json",
+        "accept-encoding": "gzip, br",
+        "anthropic-beta": "claude-code-20250219,prompt-caching-scope-2026-01-05",
+        "anthropic-dangerous-direct-browser-access": "true",
+        "anthropic-version": "2023-06-01",
+        "authorization": "REDACTED",
+        "cf-connecting-ip": "203.10.98.186",
+        "cf-ipcountry": "JP",
+        "cf-ray": "a05765a5284ac762",
+        "cf-visitor": "{\"scheme\":\"https\"}",
+        "connection": "Keep-Alive",
+        "content-length": "100958",
+        "content-type": "application/json",
+        "host": "gcf-bridge.zhangyu76.workers.dev",
+        "user-agent": "claude-cli/2.1.150 (external, cli)",
+        "x-app": "cli",
+        "x-claude-code-session-id": "776f0fd8-c2b9-4681-be40-6b431df07bea",
+        "x-forwarded-proto": "https",
+        "x-real-ip": "203.10.98.186",
+        "x-stainless-arch": "arm64",
+        "x-stainless-lang": "js",
+        "x-stainless-os": "MacOS",
+        "x-stainless-package-version": "0.94.0",
+        "x-stainless-retry-count": "0",
+        "x-stainless-runtime": "node",
+        "x-stainless-runtime-version": "v24.3.0",
+        "x-stainless-timeout": "600"
+      },
+      "cf": {
+        "httpProtocol": "HTTP/1.1",
+        "clientAcceptEncoding": "gzip, deflate, br",
+        "requestPriority": "",
+        "edgeRequestKeepAliveStatus": 1,
+        "requestHeaderNames": {},
+        "clientTcpRtt": 0,
+        "clientQuicRtt": 0,
+        "colo": "NRT",
+        "asn": 137409,
+        "asOrganization": "GSL Networks Pty LTD - Tokyo",
+        "country": "JP",
+        "isEUCountry": false,
+        "city": "Tokyo",
+        "continent": "AS",
+        "region": "Tokyo",
+        "regionCode": "13",
+        "timezone": "Asia/Tokyo",
+        "longitude": "139.69171",
+        "latitude": "35.6895",
+        "postalCode": "101-8656",
+        "tlsVersion": "TLSv1.3",
+        "tlsCipher": "AEAD-AES128-GCM-SHA256",
+        "tlsClientRandom": "9kx0BCfI8m9gISee0nJiN8q4zgbm5Wxp8ul3oerPUNg=",
+        "tlsClientCiphersSha1": "z756bn+x21PiebYy319nCdFpEYo=",
+        "tlsClientExtensionsSha1": "WWbSthm5fX2IyMecDOgDUYNG42M=",
+        "tlsClientExtensionsSha1Le": "x3C9wOJ4WRKMb/1vBgvNLe8J+Ok=",
+        "tlsExportedAuthenticator": {
+          "clientHandshake": "b4dce545fa31e52c2425e98a264b44ed410ee0fcca9d287143f33c7811aebf60",
+          "serverHandshake": "4c724284ae68c17b7f2c2c15baa51ce8ff7b366f0259aaef0bb9c79b17565643",
+          "clientFinished": "53573ec263ad378664191af750dff96b3f7a645875e65f6a893cad19f007d945",
+          "serverFinished": "95973f40a3a964d1fc31a88744660b47ce0ae5e58e0580ed70a7374a1f78b11b"
+        },
+        "tlsClientHelloLength": "508",
+        "tlsClientAuth": {
+          "certPresented": "0",
+          "certVerified": "NONE",
+          "certRevoked": "0",
+          "certIssuerDN": "",
+          "certSubjectDN": "",
+          "certIssuerDNRFC2253": "",
+          "certSubjectDNRFC2253": "",
+          "certIssuerDNLegacy": "",
+          "certSubjectDNLegacy": "",
+          "certSerial": "",
+          "certIssuerSerial": "",
+          "certSKI": "",
+          "certIssuerSKI": "",
+          "certFingerprintSHA1": "",
+          "certFingerprintSHA256": "",
+          "certNotBefore": "",
+          "certNotAfter": "",
+          "certRFC9440": "",
+          "certRFC9440TooLarge": false,
+          "certChainRFC9440": "",
+          "certChainRFC9440TooLarge": false
+        },
+        "verifiedBotCategory": "",
+        "edgeL4": {
+          "deliveryRate": 9610619
+        }
+      }
+    },
+    "response": {
+      "status": 200
+    }
+  }
+}
+{
+  "wallTime": 584,
+  "cpuTime": 3,
+  "truncated": false,
+  "executionModel": "stateless",
+  "outcome": "ok",
+  "scriptVersion": {
+    "id": "214aacd5-4d5e-4664-a4f6-184eaadcfde1"
+  },
+  "scriptName": "gcf-bridge",
+  "diagnosticsChannelEvents": [],
+  "exceptions": [],
+  "logs": [],
+  "eventTimestamp": 1780413160824,
+  "event": {
+    "request": {
+      "url": "https://gcf-bridge.zhangyu76.workers.dev/v1/v1/messages?beta=true",
+      "method": "POST",
+      "headers": {
+        "accept": "application/json",
+        "accept-encoding": "gzip, br",
+        "anthropic-beta": "claude-code-20250219,prompt-caching-scope-2026-01-05",
+        "anthropic-dangerous-direct-browser-access": "true",
+        "anthropic-version": "2023-06-01",
+        "authorization": "REDACTED",
+        "cf-connecting-ip": "203.10.98.186",
+        "cf-ipcountry": "JP",
+        "cf-ray": "a05765cd1babd771",
+        "cf-visitor": "{\"scheme\":\"https\"}",
+        "connection": "Keep-Alive",
+        "content-length": "100944",
+        "content-type": "application/json",
+        "host": "gcf-bridge.zhangyu76.workers.dev",
+        "user-agent": "claude-cli/2.1.150 (external, cli)",
+        "x-app": "cli",
+        "x-claude-code-session-id": "776f0fd8-c2b9-4681-be40-6b431df07bea",
+        "x-forwarded-proto": "https",
+        "x-real-ip": "203.10.98.186",
+        "x-stainless-arch": "arm64",
+        "x-stainless-lang": "js",
+        "x-stainless-os": "MacOS",
+        "x-stainless-package-version": "0.94.0",
+        "x-stainless-retry-count": "0",
+        "x-stainless-runtime": "node",
+        "x-stainless-runtime-version": "v24.3.0",
+        "x-stainless-timeout": "600"
+      },
+      "cf": {
+        "httpProtocol": "HTTP/1.1",
+        "clientAcceptEncoding": "gzip, deflate, br",
+        "requestPriority": "",
+        "edgeRequestKeepAliveStatus": 1,
+        "requestHeaderNames": {},
+        "clientTcpRtt": 0,
+        "clientQuicRtt": 0,
+        "colo": "NRT",
+        "asn": 137409,
+        "asOrganization": "GSL Networks Pty LTD - Tokyo",
+        "country": "JP",
+        "isEUCountry": false,
+        "city": "Tokyo",
+        "continent": "AS",
+        "region": "Tokyo",
+        "regionCode": "13",
+        "timezone": "Asia/Tokyo",
+        "longitude": "139.69171",
+        "latitude": "35.6895",
+        "postalCode": "101-8656",
+        "tlsVersion": "TLSv1.3",
+        "tlsCipher": "AEAD-AES128-GCM-SHA256",
+        "tlsClientRandom": "fujZZBWKqPWjKuCzLjn+mubHuIo6UiVLKDMXjBZkvs4=",
+        "tlsClientCiphersSha1": "z756bn+x21PiebYy319nCdFpEYo=",
+        "tlsClientExtensionsSha1": "WWbSthm5fX2IyMecDOgDUYNG42M=",
+        "tlsClientExtensionsSha1Le": "x3C9wOJ4WRKMb/1vBgvNLe8J+Ok=",
+        "tlsExportedAuthenticator": {
+          "clientHandshake": "885d1a30149613489f022e871a0e725b3dfd3b82b4140cb5928251d3ef0d8ce8",
+          "serverHandshake": "c9271f7083f4b39e2c5857a04fe0ba79fbfa94889801fb94acfb51ea5c3ebf10",
+          "clientFinished": "d9bed80be7e54a2e1f0d95f45ffca4d6ca8d0f67e6506f47aff9297fb00f9f9f",
+          "serverFinished": "f979e39f4d4ea5fe52aa975cdedaea077c3812b70b1c233153405e4bb002b594"
+        },
+        "tlsClientHelloLength": "508",
+        "tlsClientAuth": {
+          "certPresented": "0",
+          "certVerified": "NONE",
+          "certRevoked": "0",
+          "certIssuerDN": "",
+          "certSubjectDN": "",
+          "certIssuerDNRFC2253": "",
+          "certSubjectDNRFC2253": "",
+          "certIssuerDNLegacy": "",
+          "certSubjectDNLegacy": "",
+          "certSerial": "",
+          "certIssuerSerial": "",
+          "certSKI": "",
+          "certIssuerSKI": "",
+          "certFingerprintSHA1": "",
+          "certFingerprintSHA256": "",
+          "certNotBefore": "",
+          "certNotAfter": "",
+          "certRFC9440": "",
+          "certRFC9440TooLarge": false,
+          "certChainRFC9440": "",
+          "certChainRFC9440TooLarge": false
+        },
+        "verifiedBotCategory": "",
+        "edgeL4": {
+          "deliveryRate": 4572631
+        }
+      }
+    },
+    "response": {
+      "status": 200
+    }
+  }
+}
+{
+  "wallTime": 6242,
+  "cpuTime": 5,
+  "truncated": false,
+  "executionModel": "stateless",
+  "outcome": "ok",
+  "scriptVersion": {
+    "id": "214aacd5-4d5e-4664-a4f6-184eaadcfde1"
+  },
+  "scriptName": "gcf-bridge",
+  "diagnosticsChannelEvents": [],
+  "exceptions": [],
+  "logs": [],
+  "eventTimestamp": 1780413184693,
+  "event": {
+    "request": {
+      "url": "https://gcf-bridge.zhangyu76.workers.dev/v1/v1/messages?beta=true",
+      "method": "POST",
+      "headers": {
+        "accept": "application/json",
+        "accept-encoding": "gzip, br",
+        "anthropic-beta": "claude-code-20250219,prompt-caching-scope-2026-01-05",
+        "anthropic-dangerous-direct-browser-access": "true",
+        "anthropic-version": "2023-06-01",
+        "authorization": "REDACTED",
+        "cf-connecting-ip": "203.10.98.186",
+        "cf-ipcountry": "JP",
+        "cf-ray": "a05766533c12d771",
+        "cf-visitor": "{\"scheme\":\"https\"}",
+        "connection": "Keep-Alive",
+        "content-length": "101082",
+        "content-type": "application/json",
+        "host": "gcf-bridge.zhangyu76.workers.dev",
+        "user-agent": "claude-cli/2.1.150 (external, cli)",
+        "x-app": "cli",
+        "x-claude-code-session-id": "776f0fd8-c2b9-4681-be40-6b431df07bea",
+        "x-forwarded-proto": "https",
+        "x-real-ip": "203.10.98.186",
+        "x-stainless-arch": "arm64",
+        "x-stainless-lang": "js",
+        "x-stainless-os": "MacOS",
+        "x-stainless-package-version": "0.94.0",
+        "x-stainless-retry-count": "0",
+        "x-stainless-runtime": "node",
+        "x-stainless-runtime-version": "v24.3.0",
+        "x-stainless-timeout": "600"
+      },
+      "cf": {
+        "httpProtocol": "HTTP/1.1",
+        "clientAcceptEncoding": "gzip, deflate, br",
+        "requestPriority": "",
+        "edgeRequestKeepAliveStatus": 1,
+        "requestHeaderNames": {},
+        "clientTcpRtt": 0,
+        "clientQuicRtt": 0,
+        "colo": "NRT",
+        "asn": 137409,
+        "asOrganization": "GSL Networks Pty LTD - Tokyo",
+        "country": "JP",
+        "isEUCountry": false,
+        "city": "Tokyo",
+        "continent": "AS",
+        "region": "Tokyo",
+        "regionCode": "13",
+        "timezone": "Asia/Tokyo",
+        "longitude": "139.69171",
+        "latitude": "35.6895",
+        "postalCode": "101-8656",
+        "tlsVersion": "TLSv1.3",
+        "tlsCipher": "AEAD-AES128-GCM-SHA256",
+        "tlsClientRandom": "fujZZBWKqPWjKuCzLjn+mubHuIo6UiVLKDMXjBZkvs4=",
+        "tlsClientCiphersSha1": "z756bn+x21PiebYy319nCdFpEYo=",
+        "tlsClientExtensionsSha1": "WWbSthm5fX2IyMecDOgDUYNG42M=",
+        "tlsClientExtensionsSha1Le": "x3C9wOJ4WRKMb/1vBgvNLe8J+Ok=",
+        "tlsExportedAuthenticator": {
+          "clientHandshake": "885d1a30149613489f022e871a0e725b3dfd3b82b4140cb5928251d3ef0d8ce8",
+          "serverHandshake": "c9271f7083f4b39e2c5857a04fe0ba79fbfa94889801fb94acfb51ea5c3ebf10",
+          "clientFinished": "d9bed80be7e54a2e1f0d95f45ffca4d6ca8d0f67e6506f47aff9297fb00f9f9f",
+          "serverFinished": "f979e39f4d4ea5fe52aa975cdedaea077c3812b70b1c233153405e4bb002b594"
+        },
+        "tlsClientHelloLength": "508",
+        "tlsClientAuth": {
+          "certPresented": "0",
+          "certVerified": "NONE",
+          "certRevoked": "0",
+          "certIssuerDN": "",
+          "certSubjectDN": "",
+          "certIssuerDNRFC2253": "",
+          "certSubjectDNRFC2253": "",
+          "certIssuerDNLegacy": "",
+          "certSubjectDNLegacy": "",
+          "certSerial": "",
+          "certIssuerSerial": "",
+          "certSKI": "",
+          "certIssuerSKI": "",
+          "certFingerprintSHA1": "",
+          "certFingerprintSHA256": "",
+          "certNotBefore": "",
+          "certNotAfter": "",
+          "certRFC9440": "",
+          "certRFC9440TooLarge": false,
+          "certChainRFC9440": "",
+          "certChainRFC9440TooLarge": false
+        },
+        "verifiedBotCategory": "",
+        "edgeL4": {
+          "deliveryRate": 4572631
+        }
+      }
+    },
+    "response": {
+      "status": 200
+    }
+  }
+}
+{
+  "wallTime": 635,
+  "cpuTime": 2,
+  "truncated": false,
+  "executionModel": "stateless",
+  "outcome": "ok",
+  "scriptVersion": {
+    "id": "214aacd5-4d5e-4664-a4f6-184eaadcfde1"
+  },
+  "scriptName": "gcf-bridge",
+  "diagnosticsChannelEvents": [],
+  "exceptions": [],
+  "logs": [],
+  "eventTimestamp": 1780413193208,
+  "event": {
+    "request": {
+      "url": "https://gcf-bridge.zhangyu76.workers.dev/v1/v1/messages?beta=true",
+      "method": "POST",
+      "headers": {
+        "accept": "application/json",
+        "accept-encoding": "gzip, br",
+        "anthropic-beta": "claude-code-20250219,prompt-caching-scope-2026-01-05",
+        "anthropic-dangerous-direct-browser-access": "true",
+        "anthropic-version": "2023-06-01",
+        "authorization": "REDACTED",
+        "cf-connecting-ip": "203.10.98.186",
+        "cf-ipcountry": "JP",
+        "cf-ray": "a057668db995d771",
+        "cf-visitor": "{\"scheme\":\"https\"}",
+        "connection": "Keep-Alive",
+        "content-length": "101068",
+        "content-type": "application/json",
+        "host": "gcf-bridge.zhangyu76.workers.dev",
+        "user-agent": "claude-cli/2.1.150 (external, cli)",
+        "x-app": "cli",
+        "x-claude-code-session-id": "776f0fd8-c2b9-4681-be40-6b431df07bea",
+        "x-forwarded-proto": "https",
+        "x-real-ip": "203.10.98.186",
+        "x-stainless-arch": "arm64",
+        "x-stainless-lang": "js",
+        "x-stainless-os": "MacOS",
+        "x-stainless-package-version": "0.94.0",
+        "x-stainless-retry-count": "0",
+        "x-stainless-runtime": "node",
+        "x-stainless-runtime-version": "v24.3.0",
+        "x-stainless-timeout": "600"
+      },
+      "cf": {
+        "httpProtocol": "HTTP/1.1",
+        "clientAcceptEncoding": "gzip, deflate, br",
+        "requestPriority": "",
+        "edgeRequestKeepAliveStatus": 1,
+        "requestHeaderNames": {},
+        "clientTcpRtt": 0,
+        "clientQuicRtt": 0,
+        "colo": "NRT",
+        "asn": 137409,
+        "asOrganization": "GSL Networks Pty LTD - Tokyo",
+        "country": "JP",
+        "isEUCountry": false,
+        "city": "Tokyo",
+        "continent": "AS",
+        "region": "Tokyo",
+        "regionCode": "13",
+        "timezone": "Asia/Tokyo",
+        "longitude": "139.69171",
+        "latitude": "35.6895",
+        "postalCode": "101-8656",
+        "tlsVersion": "TLSv1.3",
+        "tlsCipher": "AEAD-AES128-GCM-SHA256",
+        "tlsClientRandom": "fujZZBWKqPWjKuCzLjn+mubHuIo6UiVLKDMXjBZkvs4=",
+        "tlsClientCiphersSha1": "z756bn+x21PiebYy319nCdFpEYo=",
+        "tlsClientExtensionsSha1": "WWbSthm5fX2IyMecDOgDUYNG42M=",
+        "tlsClientExtensionsSha1Le": "x3C9wOJ4WRKMb/1vBgvNLe8J+Ok=",
+        "tlsExportedAuthenticator": {
+          "clientHandshake": "885d1a30149613489f022e871a0e725b3dfd3b82b4140cb5928251d3ef0d8ce8",
+          "serverHandshake": "c9271f7083f4b39e2c5857a04fe0ba79fbfa94889801fb94acfb51ea5c3ebf10",
+          "clientFinished": "d9bed80be7e54a2e1f0d95f45ffca4d6ca8d0f67e6506f47aff9297fb00f9f9f",
+          "serverFinished": "f979e39f4d4ea5fe52aa975cdedaea077c3812b70b1c233153405e4bb002b594"
+        },
+        "tlsClientHelloLength": "508",
+        "tlsClientAuth": {
+          "certPresented": "0",
+          "certVerified": "NONE",
+          "certRevoked": "0",
+          "certIssuerDN": "",
+          "certSubjectDN": "",
+          "certIssuerDNRFC2253": "",
+          "certSubjectDNRFC2253": "",
+          "certIssuerDNLegacy": "",
+          "certSubjectDNLegacy": "",
+          "certSerial": "",
+          "certIssuerSerial": "",
+          "certSKI": "",
+          "certIssuerSKI": "",
+          "certFingerprintSHA1": "",
+          "certFingerprintSHA256": "",
+          "certNotBefore": "",
+          "certNotAfter": "",
+          "certRFC9440": "",
+          "certRFC9440TooLarge": false,
+          "certChainRFC9440": "",
+          "certChainRFC9440TooLarge": false
+        },
+        "verifiedBotCategory": "",
+        "edgeL4": {
+          "deliveryRate": 4572631
+        }
+      }
+    },
+    "response": {
+      "status": 200
+    }
+  }
+}
+{
+  "wallTime": 0,
+  "cpuTime": 0,
+  "truncated": false,
+  "executionModel": "stateless",
+  "outcome": "ok",
+  "scriptVersion": {
+    "id": "6f6ccd13-2bdb-48fe-9c17-9a8eb95e2cae"
+  },
+  "scriptName": "gcf-bridge",
+  "diagnosticsChannelEvents": [],
+  "exceptions": [],
+  "logs": [],
+  "eventTimestamp": 1780413278209,
+  "event": {
+    "request": {
+      "url": "https://gcf-bridge.zhangyu76.workers.dev/",
+      "method": "GET",
+      "headers": {
+        "accept-encoding": "gzip, br",
+        "cf-connecting-ip": "2a06:98c0:3600::103",
+        "cf-ipcountry": "US",
+        "cf-ray": "a05768aca32f5100",
+        "cf-visitor": "{\"scheme\":\"https\"}",
+        "cf-worker": "cfone.cfdata.org",
+        "connection": "Keep-Alive",
+        "host": "gcf-bridge.zhangyu76.workers.dev",
+        "x-forwarded-proto": "https",
+        "x-real-ip": "2a06:98c0:3600::103"
+      },
+      "cf": {
+        "requestHeaderNames": {},
+        "httpProtocol": "HTTP/1.1",
+        "tlsCipher": "",
+        "continent": "NA",
+        "asn": 13335,
+        "clientAcceptEncoding": "identity",
+        "verifiedBotCategory": "",
+        "country": "US",
+        "isEUCountry": false,
+        "region": "Washington",
+        "tlsClientCiphersSha1": "",
+        "tlsClientAuth": {
+          "certIssuerDNLegacy": "",
+          "certIssuerSKI": "",
+          "certSubjectDNRFC2253": "",
+          "certSubjectDNLegacy": "",
+          "certFingerprintSHA256": "",
+          "certNotBefore": "",
+          "certSKI": "",
+          "certSerial": "",
+          "certIssuerDN": "",
+          "certVerified": "NONE",
+          "certNotAfter": "",
+          "certSubjectDN": "",
+          "certPresented": "0",
+          "certRevoked": "0",
+          "certIssuerSerial": "",
+          "certIssuerDNRFC2253": "",
+          "certFingerprintSHA1": ""
+        },
+        "tlsClientRandom": "",
+        "tlsClientHelloLength": "",
+        "colo": "SEA",
+        "timezone": "America/Los_Angeles",
+        "longitude": "-122.33207",
+        "latitude": "47.60621",
+        "edgeRequestKeepAliveStatus": 1,
+        "requestPriority": "",
+        "postalCode": "98101",
+        "city": "Seattle",
+        "tlsVersion": "",
+        "regionCode": "WA",
+        "asOrganization": "Cloudflare, Inc.",
+        "metroCode": "819",
+        "tlsClientExtensionsSha1Le": "",
+        "tlsClientExtensionsSha1": ""
+      }
+    },
+    "response": {
+      "status": 200
+    }
+  }
+}
+{
+  "wallTime": 5697,
+  "cpuTime": 8,
+  "truncated": false,
+  "executionModel": "stateless",
+  "outcome": "ok",
+  "scriptVersion": {
+    "id": "6f6ccd13-2bdb-48fe-9c17-9a8eb95e2cae"
+  },
+  "scriptName": "gcf-bridge",
+  "diagnosticsChannelEvents": [],
+  "exceptions": [],
+  "logs": [
+    {
+      "message": [
+        "[GCF BRIDGE] messages.length=1 lastMsgRole=user"
+      ],
+      "level": "log",
+      "timestamp": 1780413289102
+    },
+    {
+      "message": [
+        "[GCF BRIDGE] session.lastBlocks=[\"{\\\"type\\\":\\\"text\\\",\\\"text\\\":\\\"<system-reminder>\\\\nThe following skills are available for use with the Skill tool:\\\\n\\\\n- update-config: Use this skill to configure the Claude Code harness via settings.json. Automated behaviors (\\\\\\\"from now on when X\\\\\\\", \\\\\\\"each time X\\\\\\\", \\\\\\\"whenever X\\\\\\\", \\\\\\\"before/after X\\\\\\\") require hooks configured in settings.json - the harness executes these, not Claude, so memory/preferences cannot fulfill them. Also use for: permissions (\\\\\\\"allow X\\\\\\\", \\\\\\\"add permission\\\\\\\", \\\\\\\"move permission to\\\\\\\"), env vars (\\\\\\\"set X=Y\\\\\\\"), hook troubleshooting, or any changes to settings.json/settings.local.json files. Examples: \\\\\\\"allow npm commands\\\\\\\", \\\\\\\"add bq permission to global settings\\\\\\\", \\\\\\\"move permission to user settings\\\\\\\", \\\\\\\"set DEBUG=true\\\\\\\", \\\\\\\"when claude stops show X\\\\\\\". For simple settings like theme/model, suggest the /config command.\\\\n- keybindings-help: Use when the user wants to customize keyboard shortcuts, rebind keys, add chord bindings, or modify ~/.claude/keybindings.json. Examples: \\\\\\\"rebind ctrl+s\\\\\\\", \\\\\\\"add a chord shortcut\\\\\\\", \\\\\\\"change the submit key\\\\\\\", \\\\\\\"customize keybindings\\\\\\\".\\\\n- verify: Verify that a code change actually does what it's supposed to by running the app and observing behavior. Use when asked to verify a PR, confirm a fix works, test a change manually, check that a feature works, or validate local changes before pushing.\\\\n- code-review: Review the current diff for correctness bugs at the given effort level (low/medium: fewer, high-confidence findings; high→max: broader coverage, may include uncertain findings). Pass --comment to post findings as inline PR comments.\\\\n- fewer-permission-prompts: Scan your transcripts for common read-only Bash and MCP tool calls, then add a prioritized allowlist to project .claude/settings.json to reduce permission prompts.\\\\n- loop: Run a prompt or slash command on a recurring interval (e.g. /loop 5m /foo, defaults to 10m) - When the user wants to set up a recurring task, poll for status, or run something repeatedly on an interval (e.g. \\\\\\\"check the deploy every 5 minutes\\\\\\\", \\\\\\\"keep running /babysit-prs\\\\\\\"). Do NOT invoke for one-off tasks.\\\\n- claude-api: Build, debug, and optimize Claude API / Anthropic SDK apps. Apps built with this skill should include prompt caching. Also handles migrating existing Claude API code between Claude model versions (4.5 → 4.6, 4.6 → 4.7, retired-model replacements).\\\\nTRIGGER when: code imports `anthropic`/`@anthropic-ai/sdk`; user asks for the Claude API, Anthropic SDK, or Managed Agents; user adds/modifies/tunes a Claude feature (caching, thinking, compaction, tool use, batch, files, citations, memory) or model (Opus/Sonnet/Haiku) in a file; questions about prompt caching / cache hit rate in an Anthropic SDK project.\\\\nSKIP: file imports `openai`/other-provider SDK, filename like `*-openai.py`/`*-generic.py`, provider-neutral code, general programming/ML.\\\\n- run: Launch and drive this project's app to see a change working. Use when asked to run, start, or screenshot the app, or to confirm a change works in the real app (not just tests). First looks for a project skill that already covers launching the app; otherwise falls back to built-in patterns per project type (CLI, server, TUI, Electron, browser-driven, library).\\\\n- init: Initialize a new CLAUDE.md file with codebase documentation\\\\n- review: Review a pull request\\\\n- security-review: Complete a security review of the pending changes on the current branch\\\\n</system-reminder>\\\\n\\\"}\",\"{\\\"type\\\":\\\"text\\\",\\\"text\\\":\\\"<system-reminder>\\\\nAs you answer the user's questions, you can use the following context:\\\\n# currentDate\\\\nToday's date is 2026/06/02.\\\\n\\\\n      IMPORTANT: this context may or may not be relevant to your tasks. You should not respond to this context unless it is highly relevant to your task.\\\\n</system-reminder>\\\\n\\\\n\\\"}\",\"{\\\"type\\\":\\\"text\\\",\\\"text\\\":\\\"hello\\\\n\\\",\\\"cache_control\\\":{\\\"type\\\":\\\"ephemeral\\\"}}\"]"
+      ],
+      "level": "log",
+      "timestamp": 1780413289102
+    },
+    {
+      "message": [
+        "[GCF BRIDGE] currentSigs=[\"{\\\"type\\\":\\\"text\\\",\\\"text\\\":\\\"<system-reminder>\\\\nThe following skills are available for use with the Skill tool:\\\\n\\\\n- update-config: Use this skill to configure the Claude Code harness via settings.json. Automated behaviors (\\\\\\\"from now on when X\\\\\\\", \\\\\\\"each time X\\\\\\\", \\\\\\\"whenever X\\\\\\\", \\\\\\\"before/after X\\\\\\\") require hooks configured in settings.json - the harness executes these, not Claude, so memory/preferences cannot fulfill them. Also use for: permissions (\\\\\\\"allow X\\\\\\\", \\\\\\\"add permission\\\\\\\", \\\\\\\"move permission to\\\\\\\"), env vars (\\\\\\\"set X=Y\\\\\\\"), hook troubleshooting, or any changes to settings.json/settings.local.json files. Examples: \\\\\\\"allow npm commands\\\\\\\", \\\\\\\"add bq permission to global settings\\\\\\\", \\\\\\\"move permission to user settings\\\\\\\", \\\\\\\"set DEBUG=true\\\\\\\", \\\\\\\"when claude stops show X\\\\\\\". For simple settings like theme/model, suggest the /config command.\\\\n- keybindings-help: Use when the user wants to customize keyboard shortcuts, rebind keys, add chord bindings, or modify ~/.claude/keybindings.json. Examples: \\\\\\\"rebind ctrl+s\\\\\\\", \\\\\\\"add a chord shortcut\\\\\\\", \\\\\\\"change the submit key\\\\\\\", \\\\\\\"customize keybindings\\\\\\\".\\\\n- verify: Verify that a code change actually does what it's supposed to by running the app and observing behavior. Use when asked to verify a PR, confirm a fix works, test a change manually, check that a feature works, or validate local changes before pushing.\\\\n- code-review: Review the current diff for correctness bugs at the given effort level (low/medium: fewer, high-confidence findings; high→max: broader coverage, may include uncertain findings). Pass --comment to post findings as inline PR comments.\\\\n- fewer-permission-prompts: Scan your transcripts for common read-only Bash and MCP tool calls, then add a prioritized allowlist to project .claude/settings.json to reduce permission prompts.\\\\n- loop: Run a prompt or slash command on a recurring interval (e.g. /loop 5m /foo, defaults to 10m) - When the user wants to set up a recurring task, poll for status, or run something repeatedly on an interval (e.g. \\\\\\\"check the deploy every 5 minutes\\\\\\\", \\\\\\\"keep running /babysit-prs\\\\\\\"). Do NOT invoke for one-off tasks.\\\\n- claude-api: Build, debug, and optimize Claude API / Anthropic SDK apps. Apps built with this skill should include prompt caching. Also handles migrating existing Claude API code between Claude model versions (4.5 → 4.6, 4.6 → 4.7, retired-model replacements).\\\\nTRIGGER when: code imports `anthropic`/`@anthropic-ai/sdk`; user asks for the Claude API, Anthropic SDK, or Managed Agents; user adds/modifies/tunes a Claude feature (caching, thinking, compaction, tool use, batch, files, citations, memory) or model (Opus/Sonnet/Haiku) in a file; questions about prompt caching / cache hit rate in an Anthropic SDK project.\\\\nSKIP: file imports `openai`/other-provider SDK, filename like `*-openai.py`/`*-generic.py`, provider-neutral code, general programming/ML.\\\\n- run: Launch and drive this project's app to see a change working. Use when asked to run, start, or screenshot the app, or to confirm a change works in the real app (not just tests). First looks for a project skill that already covers launching the app; otherwise falls back to built-in patterns per project type (CLI, server, TUI, Electron, browser-driven, library).\\\\n- init: Initialize a new CLAUDE.md file with codebase documentation\\\\n- review: Review a pull request\\\\n- security-review: Complete a security review of the pending changes on the current branch\\\\n</system-reminder>\\\\n\\\"}\",\"{\\\"type\\\":\\\"text\\\",\\\"text\\\":\\\"<system-reminder>\\\\nAs you answer the user's questions, you can use the following context:\\\\n# currentDate\\\\nToday's date is 2026/06/02.\\\\n\\\\n      IMPORTANT: this context may or may not be relevant to your tasks. You should not respond to this context unless it is highly relevant to your task.\\\\n</system-reminder>\\\\n\\\\n\\\"}\",\"{\\\"type\\\":\\\"text\\\",\\\"text\\\":\\\"hello\\\\n\\\",\\\"cache_control\\\":{\\\"type\\\":\\\"ephemeral\\\"}}\"]"
+      ],
+      "level": "log",
+      "timestamp": 1780413289102
+    },
+    {
+      "message": [
+        "[GCF BRIDGE] deltaBlocks=[\"{\\\"type\\\":\\\"text\\\",\\\"text\\\":\\\"<system-reminder>\\\\nThe following skills are available for use with the Skill tool:\\\\n\\\\n- update-config: Use this skill to configure the Claude Code harness via settings.json. Automated behaviors (\\\\\\\"from now on when X\\\\\\\", \\\\\\\"each time X\\\\\\\", \\\\\\\"whenever X\\\\\\\", \\\\\\\"before/after X\\\\\\\") require hooks configured in settings.json - the harness executes these, not Claude, so memory/preferences cannot fulfill them. Also use for: permissions (\\\\\\\"allow X\\\\\\\", \\\\\\\"add permission\\\\\\\", \\\\\\\"move permission to\\\\\\\"), env vars (\\\\\\\"set X=Y\\\\\\\"), hook troubleshooting, or any changes to settings.json/settings.local.json files. Examples: \\\\\\\"allow npm commands\\\\\\\", \\\\\\\"add bq permission to global settings\\\\\\\", \\\\\\\"move permission to user settings\\\\\\\", \\\\\\\"set DEBUG=true\\\\\\\", \\\\\\\"when claude stops show X\\\\\\\". For simple settings like theme/model, suggest the /config command.\\\\n- keybindings-help: Use when the user wants to customize keyboard shortcuts, rebind keys, add chord bindings, or modify ~/.claude/keybindings.json. Examples: \\\\\\\"rebind ctrl+s\\\\\\\", \\\\\\\"add a chord shortcut\\\\\\\", \\\\\\\"change the submit key\\\\\\\", \\\\\\\"customize keybindings\\\\\\\".\\\\n- verify: Verify that a code change actually does what it's supposed to by running the app and observing behavior. Use when asked to verify a PR, confirm a fix works, test a change manually, check that a feature works, or validate local changes before pushing.\\\\n- code-review: Review the current diff for correctness bugs at the given effort level (low/medium: fewer, high-confidence findings; high→max: broader coverage, may include uncertain findings). Pass --comment to post findings as inline PR comments.\\\\n- fewer-permission-prompts: Scan your transcripts for common read-only Bash and MCP tool calls, then add a prioritized allowlist to project .claude/settings.json to reduce permission prompts.\\\\n- loop: Run a prompt or slash command on a recurring interval (e.g. /loop 5m /foo, defaults to 10m) - When the user wants to set up a recurring task, poll for status, or run something repeatedly on an interval (e.g. \\\\\\\"check the deploy every 5 minutes\\\\\\\", \\\\\\\"keep running /babysit-prs\\\\\\\"). Do NOT invoke for one-off tasks.\\\\n- claude-api: Build, debug, and optimize Claude API / Anthropic SDK apps. Apps built with this skill should include prompt caching. Also handles migrating existing Claude API code between Claude model versions (4.5 → 4.6, 4.6 → 4.7, retired-model replacements).\\\\nTRIGGER when: code imports `anthropic`/`@anthropic-ai/sdk`; user asks for the Claude API, Anthropic SDK, or Managed Agents; user adds/modifies/tunes a Claude feature (caching, thinking, compaction, tool use, batch, files, citations, memory) or model (Opus/Sonnet/Haiku) in a file; questions about prompt caching / cache hit rate in an Anthropic SDK project.\\\\nSKIP: file imports `openai`/other-provider SDK, filename like `*-openai.py`/`*-generic.py`, provider-neutral code, general programming/ML.\\\\n- run: Launch and drive this project's app to see a change working. Use when asked to run, start, or screenshot the app, or to confirm a change works in the real app (not just tests). First looks for a project skill that already covers launching the app; otherwise falls back to built-in patterns per project type (CLI, server, TUI, Electron, browser-driven, library).\\\\n- init: Initialize a new CLAUDE.md file with codebase documentation\\\\n- review: Review a pull request\\\\n- security-review: Complete a security review of the pending changes on the current branch\\\\n</system-reminder>\\\\n\\\"}\",\"{\\\"type\\\":\\\"text\\\",\\\"text\\\":\\\"<system-reminder>\\\\nAs you answer the user's questions, you can use the following context:\\\\n# currentDate\\\\nToday's date is 2026/06/02.\\\\n\\\\n      IMPORTANT: this context may or may not be relevant to your tasks. You should not respond to this context unless it is highly relevant to your task.\\\\n</system-reminder>\\\\n\\\\n\\\"}\",\"{\\\"type\\\":\\\"text\\\",\\\"text\\\":\\\"hello\\\\n\\\",\\\"cache_control\\\":{\\\"type\\\":\\\"ephemeral\\\"}}\"]"
+      ],
+      "level": "log",
+      "timestamp": 1780413289102
+    }
+  ],
+  "eventTimestamp": 1780413288846,
+  "event": {
+    "request": {
+      "url": "https://gcf-bridge.zhangyu76.workers.dev/v1/v1/messages?beta=true",
+      "method": "POST",
+      "headers": {
+        "accept": "application/json",
+        "accept-encoding": "gzip, br",
+        "anthropic-beta": "claude-code-20250219,prompt-caching-scope-2026-01-05",
+        "anthropic-dangerous-direct-browser-access": "true",
+        "anthropic-version": "2023-06-01",
+        "authorization": "REDACTED",
+        "cf-connecting-ip": "203.10.98.186",
+        "cf-ipcountry": "JP",
+        "cf-ray": "a05768ee79b72821",
+        "cf-visitor": "{\"scheme\":\"https\"}",
+        "connection": "Keep-Alive",
+        "content-length": "104306",
+        "content-type": "application/json",
+        "host": "gcf-bridge.zhangyu76.workers.dev",
+        "user-agent": "claude-cli/2.1.150 (external, sdk-cli)",
+        "x-app": "cli",
+        "x-claude-code-session-id": "de5a01e5-612a-4201-a2d9-680598ffe8ca",
+        "x-forwarded-proto": "https",
+        "x-real-ip": "203.10.98.186",
+        "x-stainless-arch": "arm64",
+        "x-stainless-lang": "js",
+        "x-stainless-os": "MacOS",
+        "x-stainless-package-version": "0.94.0",
+        "x-stainless-retry-count": "0",
+        "x-stainless-runtime": "node",
+        "x-stainless-runtime-version": "v24.3.0",
+        "x-stainless-timeout": "600"
+      },
+      "cf": {
+        "httpProtocol": "HTTP/1.1",
+        "clientAcceptEncoding": "gzip, deflate, br",
+        "requestPriority": "",
+        "edgeRequestKeepAliveStatus": 1,
+        "requestHeaderNames": {},
+        "clientTcpRtt": 0,
+        "clientQuicRtt": 0,
+        "colo": "NRT",
+        "asn": 137409,
+        "asOrganization": "GSL Networks Pty LTD - Tokyo",
+        "country": "JP",
+        "isEUCountry": false,
+        "city": "Tokyo",
+        "continent": "AS",
+        "region": "Tokyo",
+        "regionCode": "13",
+        "timezone": "Asia/Tokyo",
+        "longitude": "139.69171",
+        "latitude": "35.6895",
+        "postalCode": "101-8656",
+        "tlsVersion": "TLSv1.3",
+        "tlsCipher": "AEAD-AES128-GCM-SHA256",
+        "tlsClientRandom": "jGckAiKS+mwMDGZ2wGzpSzQAGkEi4OHkCQyi66XOCL4=",
+        "tlsClientCiphersSha1": "z756bn+x21PiebYy319nCdFpEYo=",
+        "tlsClientExtensionsSha1": "WWbSthm5fX2IyMecDOgDUYNG42M=",
+        "tlsClientExtensionsSha1Le": "x3C9wOJ4WRKMb/1vBgvNLe8J+Ok=",
+        "tlsExportedAuthenticator": {
+          "clientHandshake": "ab9dfa4cb1377aacaf7db76a69e3c3db4f47b5499edb9ad78516d08a63a7f382",
+          "serverHandshake": "a0f934a37a2ddc42dce8afb31b2a2fdfb7127d1998b79637f637ae8f1576b6fa",
+          "clientFinished": "df121d3475f59de117b3be57a7fc98ac70de0fb552324c494ce8d0ae4ec913df",
+          "serverFinished": "aa6e4fbabfdae6f54989597af30d3ce2da496a0a605515bd0ad0e29668ba2013"
+        },
+        "tlsClientHelloLength": "508",
+        "tlsClientAuth": {
+          "certPresented": "0",
+          "certVerified": "NONE",
+          "certRevoked": "0",
+          "certIssuerDN": "",
+          "certSubjectDN": "",
+          "certIssuerDNRFC2253": "",
+          "certSubjectDNRFC2253": "",
+          "certIssuerDNLegacy": "",
+          "certSubjectDNLegacy": "",
+          "certSerial": "",
+          "certIssuerSerial": "",
+          "certSKI": "",
+          "certIssuerSKI": "",
+          "certFingerprintSHA1": "",
+          "certFingerprintSHA256": "",
+          "certNotBefore": "",
+          "certNotAfter": "",
+          "certRFC9440": "",
+          "certRFC9440TooLarge": false,
+          "certChainRFC9440": "",
+          "certChainRFC9440TooLarge": false
+        },
+        "verifiedBotCategory": "",
+        "edgeL4": {
+          "deliveryRate": 10197183
+        }
+      }
+    },
+    "response": {
+      "status": 200
+    }
+  }
+}
+{
+  "wallTime": 4649,
+  "cpuTime": 3,
+  "truncated": false,
+  "executionModel": "stateless",
+  "outcome": "ok",
+  "scriptVersion": {
+    "id": "6f6ccd13-2bdb-48fe-9c17-9a8eb95e2cae"
+  },
+  "scriptName": "gcf-bridge",
+  "diagnosticsChannelEvents": [],
+  "exceptions": [],
+  "logs": [
+    {
+      "message": [
+        "[GCF BRIDGE] messages.length=1 lastMsgRole=user"
+      ],
+      "level": "log",
+      "timestamp": 1780413294975
+    },
+    {
+      "message": [
+        "[GCF BRIDGE] session.lastBlocks=[\"{\\\"type\\\":\\\"text\\\",\\\"text\\\":\\\"<system-reminder>\\\\nThe following skills are available for use with the Skill tool:\\\\n\\\\n- update-config: Use this skill to configure the Claude Code harness via settings.json. Automated behaviors (\\\\\\\"from now on when X\\\\\\\", \\\\\\\"each time X\\\\\\\", \\\\\\\"whenever X\\\\\\\", \\\\\\\"before/after X\\\\\\\") require hooks configured in settings.json - the harness executes these, not Claude, so memory/preferences cannot fulfill them. Also use for: permissions (\\\\\\\"allow X\\\\\\\", \\\\\\\"add permission\\\\\\\", \\\\\\\"move permission to\\\\\\\"), env vars (\\\\\\\"set X=Y\\\\\\\"), hook troubleshooting, or any changes to settings.json/settings.local.json files. Examples: \\\\\\\"allow npm commands\\\\\\\", \\\\\\\"add bq permission to global settings\\\\\\\", \\\\\\\"move permission to user settings\\\\\\\", \\\\\\\"set DEBUG=true\\\\\\\", \\\\\\\"when claude stops show X\\\\\\\". For simple settings like theme/model, suggest the /config command.\\\\n- keybindings-help: Use when the user wants to customize keyboard shortcuts, rebind keys, add chord bindings, or modify ~/.claude/keybindings.json. Examples: \\\\\\\"rebind ctrl+s\\\\\\\", \\\\\\\"add a chord shortcut\\\\\\\", \\\\\\\"change the submit key\\\\\\\", \\\\\\\"customize keybindings\\\\\\\".\\\\n- verify: Verify that a code change actually does what it's supposed to by running the app and observing behavior. Use when asked to verify a PR, confirm a fix works, test a change manually, check that a feature works, or validate local changes before pushing.\\\\n- code-review: Review the current diff for correctness bugs at the given effort level (low/medium: fewer, high-confidence findings; high→max: broader coverage, may include uncertain findings). Pass --comment to post findings as inline PR comments.\\\\n- fewer-permission-prompts: Scan your transcripts for common read-only Bash and MCP tool calls, then add a prioritized allowlist to project .claude/settings.json to reduce permission prompts.\\\\n- loop: Run a prompt or slash command on a recurring interval (e.g. /loop 5m /foo, defaults to 10m) - When the user wants to set up a recurring task, poll for status, or run something repeatedly on an interval (e.g. \\\\\\\"check the deploy every 5 minutes\\\\\\\", \\\\\\\"keep running /babysit-prs\\\\\\\"). Do NOT invoke for one-off tasks.\\\\n- claude-api: Build, debug, and optimize Claude API / Anthropic SDK apps. Apps built with this skill should include prompt caching. Also handles migrating existing Claude API code between Claude model versions (4.5 → 4.6, 4.6 → 4.7, retired-model replacements).\\\\nTRIGGER when: code imports `anthropic`/`@anthropic-ai/sdk`; user asks for the Claude API, Anthropic SDK, or Managed Agents; user adds/modifies/tunes a Claude feature (caching, thinking, compaction, tool use, batch, files, citations, memory) or model (Opus/Sonnet/Haiku) in a file; questions about prompt caching / cache hit rate in an Anthropic SDK project.\\\\nSKIP: file imports `openai`/other-provider SDK, filename like `*-openai.py`/`*-generic.py`, provider-neutral code, general programming/ML.\\\\n- run: Launch and drive this project's app to see a change working. Use when asked to run, start, or screenshot the app, or to confirm a change works in the real app (not just tests). First looks for a project skill that already covers launching the app; otherwise falls back to built-in patterns per project type (CLI, server, TUI, Electron, browser-driven, library).\\\\n- init: Initialize a new CLAUDE.md file with codebase documentation\\\\n- review: Review a pull request\\\\n- security-review: Complete a security review of the pending changes on the current branch\\\\n</system-reminder>\\\\n\\\"}\",\"{\\\"type\\\":\\\"text\\\",\\\"text\\\":\\\"<system-reminder>\\\\nAs you answer the user's questions, you can use the following context:\\\\n# currentDate\\\\nToday's date is 2026/06/02.\\\\n\\\\n      IMPORTANT: this context may or may not be relevant to your tasks. You should not respond to this context unless it is highly relevant to your task.\\\\n</system-reminder>\\\\n\\\\n\\\"}\",\"{\\\"type\\\":\\\"text\\\",\\\"text\\\":\\\"hello\\\\n\\\",\\\"cache_control\\\":{\\\"type\\\":\\\"ephemeral\\\"}}\"]"
+      ],
+      "level": "log",
+      "timestamp": 1780413294975
+    },
+    {
+      "message": [
+        "[GCF BRIDGE] currentSigs=[\"{\\\"type\\\":\\\"text\\\",\\\"text\\\":\\\"<system-reminder>\\\\nThe following skills are available for use with the Skill tool:\\\\n\\\\n- update-config: Use this skill to configure the Claude Code harness via settings.json. Automated behaviors (\\\\\\\"from now on when X\\\\\\\", \\\\\\\"each time X\\\\\\\", \\\\\\\"whenever X\\\\\\\", \\\\\\\"before/after X\\\\\\\") require hooks configured in settings.json - the harness executes these, not Claude, so memory/preferences cannot fulfill them. Also use for: permissions (\\\\\\\"allow X\\\\\\\", \\\\\\\"add permission\\\\\\\", \\\\\\\"move permission to\\\\\\\"), env vars (\\\\\\\"set X=Y\\\\\\\"), hook troubleshooting, or any changes to settings.json/settings.local.json files. Examples: \\\\\\\"allow npm commands\\\\\\\", \\\\\\\"add bq permission to global settings\\\\\\\", \\\\\\\"move permission to user settings\\\\\\\", \\\\\\\"set DEBUG=true\\\\\\\", \\\\\\\"when claude stops show X\\\\\\\". For simple settings like theme/model, suggest the /config command.\\\\n- keybindings-help: Use when the user wants to customize keyboard shortcuts, rebind keys, add chord bindings, or modify ~/.claude/keybindings.json. Examples: \\\\\\\"rebind ctrl+s\\\\\\\", \\\\\\\"add a chord shortcut\\\\\\\", \\\\\\\"change the submit key\\\\\\\", \\\\\\\"customize keybindings\\\\\\\".\\\\n- verify: Verify that a code change actually does what it's supposed to by running the app and observing behavior. Use when asked to verify a PR, confirm a fix works, test a change manually, check that a feature works, or validate local changes before pushing.\\\\n- code-review: Review the current diff for correctness bugs at the given effort level (low/medium: fewer, high-confidence findings; high→max: broader coverage, may include uncertain findings). Pass --comment to post findings as inline PR comments.\\\\n- fewer-permission-prompts: Scan your transcripts for common read-only Bash and MCP tool calls, then add a prioritized allowlist to project .claude/settings.json to reduce permission prompts.\\\\n- loop: Run a prompt or slash command on a recurring interval (e.g. /loop 5m /foo, defaults to 10m) - When the user wants to set up a recurring task, poll for status, or run something repeatedly on an interval (e.g. \\\\\\\"check the deploy every 5 minutes\\\\\\\", \\\\\\\"keep running /babysit-prs\\\\\\\"). Do NOT invoke for one-off tasks.\\\\n- claude-api: Build, debug, and optimize Claude API / Anthropic SDK apps. Apps built with this skill should include prompt caching. Also handles migrating existing Claude API code between Claude model versions (4.5 → 4.6, 4.6 → 4.7, retired-model replacements).\\\\nTRIGGER when: code imports `anthropic`/`@anthropic-ai/sdk`; user asks for the Claude API, Anthropic SDK, or Managed Agents; user adds/modifies/tunes a Claude feature (caching, thinking, compaction, tool use, batch, files, citations, memory) or model (Opus/Sonnet/Haiku) in a file; questions about prompt caching / cache hit rate in an Anthropic SDK project.\\\\nSKIP: file imports `openai`/other-provider SDK, filename like `*-openai.py`/`*-generic.py`, provider-neutral code, general programming/ML.\\\\n- run: Launch and drive this project's app to see a change working. Use when asked to run, start, or screenshot the app, or to confirm a change works in the real app (not just tests). First looks for a project skill that already covers launching the app; otherwise falls back to built-in patterns per project type (CLI, server, TUI, Electron, browser-driven, library).\\\\n- init: Initialize a new CLAUDE.md file with codebase documentation\\\\n- review: Review a pull request\\\\n- security-review: Complete a security review of the pending changes on the current branch\\\\n</system-reminder>\\\\n\\\"}\",\"{\\\"type\\\":\\\"text\\\",\\\"text\\\":\\\"<system-reminder>\\\\nAs you answer the user's questions, you can use the following context:\\\\n# currentDate\\\\nToday's date is 2026/06/02.\\\\n\\\\n      IMPORTANT: this context may or may not be relevant to your tasks. You should not respond to this context unless it is highly relevant to your task.\\\\n</system-reminder>\\\\n\\\\n\\\"}\",\"{\\\"type\\\":\\\"text\\\",\\\"text\\\":\\\"hello\\\\n\\\",\\\"cache_control\\\":{\\\"type\\\":\\\"ephemeral\\\"}}\"]"
+      ],
+      "level": "log",
+      "timestamp": 1780413294975
+    },
+    {
+      "message": [
+        "[GCF BRIDGE] deltaBlocks=[\"{\\\"type\\\":\\\"text\\\",\\\"text\\\":\\\"<system-reminder>\\\\nThe following skills are available for use with the Skill tool:\\\\n\\\\n- update-config: Use this skill to configure the Claude Code harness via settings.json. Automated behaviors (\\\\\\\"from now on when X\\\\\\\", \\\\\\\"each time X\\\\\\\", \\\\\\\"whenever X\\\\\\\", \\\\\\\"before/after X\\\\\\\") require hooks configured in settings.json - the harness executes these, not Claude, so memory/preferences cannot fulfill them. Also use for: permissions (\\\\\\\"allow X\\\\\\\", \\\\\\\"add permission\\\\\\\", \\\\\\\"move permission to\\\\\\\"), env vars (\\\\\\\"set X=Y\\\\\\\"), hook troubleshooting, or any changes to settings.json/settings.local.json files. Examples: \\\\\\\"allow npm commands\\\\\\\", \\\\\\\"add bq permission to global settings\\\\\\\", \\\\\\\"move permission to user settings\\\\\\\", \\\\\\\"set DEBUG=true\\\\\\\", \\\\\\\"when claude stops show X\\\\\\\". For simple settings like theme/model, suggest the /config command.\\\\n- keybindings-help: Use when the user wants to customize keyboard shortcuts, rebind keys, add chord bindings, or modify ~/.claude/keybindings.json. Examples: \\\\\\\"rebind ctrl+s\\\\\\\", \\\\\\\"add a chord shortcut\\\\\\\", \\\\\\\"change the submit key\\\\\\\", \\\\\\\"customize keybindings\\\\\\\".\\\\n- verify: Verify that a code change actually does what it's supposed to by running the app and observing behavior. Use when asked to verify a PR, confirm a fix works, test a change manually, check that a feature works, or validate local changes before pushing.\\\\n- code-review: Review the current diff for correctness bugs at the given effort level (low/medium: fewer, high-confidence findings; high→max: broader coverage, may include uncertain findings). Pass --comment to post findings as inline PR comments.\\\\n- fewer-permission-prompts: Scan your transcripts for common read-only Bash and MCP tool calls, then add a prioritized allowlist to project .claude/settings.json to reduce permission prompts.\\\\n- loop: Run a prompt or slash command on a recurring interval (e.g. /loop 5m /foo, defaults to 10m) - When the user wants to set up a recurring task, poll for status, or run something repeatedly on an interval (e.g. \\\\\\\"check the deploy every 5 minutes\\\\\\\", \\\\\\\"keep running /babysit-prs\\\\\\\"). Do NOT invoke for one-off tasks.\\\\n- claude-api: Build, debug, and optimize Claude API / Anthropic SDK apps. Apps built with this skill should include prompt caching. Also handles migrating existing Claude API code between Claude model versions (4.5 → 4.6, 4.6 → 4.7, retired-model replacements).\\\\nTRIGGER when: code imports `anthropic`/`@anthropic-ai/sdk`; user asks for the Claude API, Anthropic SDK, or Managed Agents; user adds/modifies/tunes a Claude feature (caching, thinking, compaction, tool use, batch, files, citations, memory) or model (Opus/Sonnet/Haiku) in a file; questions about prompt caching / cache hit rate in an Anthropic SDK project.\\\\nSKIP: file imports `openai`/other-provider SDK, filename like `*-openai.py`/`*-generic.py`, provider-neutral code, general programming/ML.\\\\n- run: Launch and drive this project's app to see a change working. Use when asked to run, start, or screenshot the app, or to confirm a change works in the real app (not just tests). First looks for a project skill that already covers launching the app; otherwise falls back to built-in patterns per project type (CLI, server, TUI, Electron, browser-driven, library).\\\\n- init: Initialize a new CLAUDE.md file with codebase documentation\\\\n- review: Review a pull request\\\\n- security-review: Complete a security review of the pending changes on the current branch\\\\n</system-reminder>\\\\n\\\"}\",\"{\\\"type\\\":\\\"text\\\",\\\"text\\\":\\\"<system-reminder>\\\\nAs you answer the user's questions, you can use the following context:\\\\n# currentDate\\\\nToday's date is 2026/06/02.\\\\n\\\\n      IMPORTANT: this context may or may not be relevant to your tasks. You should not respond to this context unless it is highly relevant to your task.\\\\n</system-reminder>\\\\n\\\\n\\\"}\",\"{\\\"type\\\":\\\"text\\\",\\\"text\\\":\\\"hello\\\\n\\\",\\\"cache_control\\\":{\\\"type\\\":\\\"ephemeral\\\"}}\"]"
+      ],
+      "level": "log",
+      "timestamp": 1780413294975
+    }
+  ],
+  "eventTimestamp": 1780413294972,
+  "event": {
+    "request": {
+      "url": "https://gcf-bridge.zhangyu76.workers.dev/v1/v1/messages?beta=true",
+      "method": "POST",
+      "headers": {
+        "accept": "application/json",
+        "accept-encoding": "gzip, br",
+        "anthropic-beta": "claude-code-20250219,prompt-caching-scope-2026-01-05",
+        "anthropic-dangerous-direct-browser-access": "true",
+        "anthropic-version": "2023-06-01",
+        "authorization": "REDACTED",
+        "cf-connecting-ip": "203.10.98.186",
+        "cf-ipcountry": "JP",
+        "cf-ray": "a057691528e92821",
+        "cf-visitor": "{\"scheme\":\"https\"}",
+        "connection": "Keep-Alive",
+        "content-length": "104292",
+        "content-type": "application/json",
+        "host": "gcf-bridge.zhangyu76.workers.dev",
+        "user-agent": "claude-cli/2.1.150 (external, sdk-cli)",
+        "x-app": "cli",
+        "x-claude-code-session-id": "de5a01e5-612a-4201-a2d9-680598ffe8ca",
+        "x-forwarded-proto": "https",
+        "x-real-ip": "203.10.98.186",
+        "x-stainless-arch": "arm64",
+        "x-stainless-lang": "js",
+        "x-stainless-os": "MacOS",
+        "x-stainless-package-version": "0.94.0",
+        "x-stainless-retry-count": "0",
+        "x-stainless-runtime": "node",
+        "x-stainless-runtime-version": "v24.3.0",
+        "x-stainless-timeout": "600"
+      },
+      "cf": {
+        "httpProtocol": "HTTP/1.1",
+        "clientAcceptEncoding": "gzip, deflate, br",
+        "requestPriority": "",
+        "edgeRequestKeepAliveStatus": 1,
+        "requestHeaderNames": {},
+        "clientTcpRtt": 0,
+        "clientQuicRtt": 0,
+        "colo": "NRT",
+        "asn": 137409,
+        "asOrganization": "GSL Networks Pty LTD - Tokyo",
+        "country": "JP",
+        "isEUCountry": false,
+        "city": "Tokyo",
+        "continent": "AS",
+        "region": "Tokyo",
+        "regionCode": "13",
+        "timezone": "Asia/Tokyo",
+        "longitude": "139.69171",
+        "latitude": "35.6895",
+        "postalCode": "101-8656",
+        "tlsVersion": "TLSv1.3",
+        "tlsCipher": "AEAD-AES128-GCM-SHA256",
+        "tlsClientRandom": "jGckAiKS+mwMDGZ2wGzpSzQAGkEi4OHkCQyi66XOCL4=",
+        "tlsClientCiphersSha1": "z756bn+x21PiebYy319nCdFpEYo=",
+        "tlsClientExtensionsSha1": "WWbSthm5fX2IyMecDOgDUYNG42M=",
+        "tlsClientExtensionsSha1Le": "x3C9wOJ4WRKMb/1vBgvNLe8J+Ok=",
+        "tlsExportedAuthenticator": {
+          "clientHandshake": "ab9dfa4cb1377aacaf7db76a69e3c3db4f47b5499edb9ad78516d08a63a7f382",
+          "serverHandshake": "a0f934a37a2ddc42dce8afb31b2a2fdfb7127d1998b79637f637ae8f1576b6fa",
+          "clientFinished": "df121d3475f59de117b3be57a7fc98ac70de0fb552324c494ce8d0ae4ec913df",
+          "serverFinished": "aa6e4fbabfdae6f54989597af30d3ce2da496a0a605515bd0ad0e29668ba2013"
+        },
+        "tlsClientHelloLength": "508",
+        "tlsClientAuth": {
+          "certPresented": "0",
+          "certVerified": "NONE",
+          "certRevoked": "0",
+          "certIssuerDN": "",
+          "certSubjectDN": "",
+          "certIssuerDNRFC2253": "",
+          "certSubjectDNRFC2253": "",
+          "certIssuerDNLegacy": "",
+          "certSubjectDNLegacy": "",
+          "certSerial": "",
+          "certIssuerSerial": "",
+          "certSKI": "",
+          "certIssuerSKI": "",
+          "certFingerprintSHA1": "",
+          "certFingerprintSHA256": "",
+          "certNotBefore": "",
+          "certNotAfter": "",
+          "certRFC9440": "",
+          "certRFC9440TooLarge": false,
+          "certChainRFC9440": "",
+          "certChainRFC9440TooLarge": false
+        },
+        "verifiedBotCategory": "",
+        "edgeL4": {
+          "deliveryRate": 10197183
+        }
+      }
+    },
+    "response": {
+      "status": 200
+    }
+  }
+}
+{
+  "wallTime": 0,
+  "cpuTime": 0,
+  "truncated": false,
+  "executionModel": "stateless",
+  "outcome": "ok",
+  "scriptVersion": {
+    "id": "dd012be1-60c5-4292-80fe-11f2f620b183"
+  },
+  "scriptName": "gcf-bridge",
+  "diagnosticsChannelEvents": [],
+  "exceptions": [],
+  "logs": [],
+  "eventTimestamp": 1780413684632,
+  "event": {
+    "request": {
+      "url": "https://gcf-bridge.zhangyu76.workers.dev/",
+      "method": "GET",
+      "headers": {
+        "accept-encoding": "gzip, br",
+        "cf-connecting-ip": "2a06:98c0:3600::103",
+        "cf-ipcountry": "US",
+        "cf-ray": "a0577298d0574801",
+        "cf-visitor": "{\"scheme\":\"https\"}",
+        "cf-worker": "cfone.cfdata.org",
+        "connection": "Keep-Alive",
+        "host": "gcf-bridge.zhangyu76.workers.dev",
+        "x-forwarded-proto": "https",
+        "x-real-ip": "2a06:98c0:3600::103"
+      },
+      "cf": {
+        "requestHeaderNames": {},
+        "httpProtocol": "HTTP/1.1",
+        "tlsCipher": "",
+        "continent": "NA",
+        "asn": 13335,
+        "clientAcceptEncoding": "identity",
+        "verifiedBotCategory": "",
+        "country": "US",
+        "isEUCountry": false,
+        "region": "California",
+        "tlsClientCiphersSha1": "",
+        "tlsClientAuth": {
+          "certIssuerDNLegacy": "",
+          "certIssuerSKI": "",
+          "certSubjectDNRFC2253": "",
+          "certSubjectDNLegacy": "",
+          "certFingerprintSHA256": "",
+          "certNotBefore": "",
+          "certSKI": "",
+          "certSerial": "",
+          "certIssuerDN": "",
+          "certVerified": "NONE",
+          "certNotAfter": "",
+          "certSubjectDN": "",
+          "certPresented": "0",
+          "certRevoked": "0",
+          "certIssuerSerial": "",
+          "certIssuerDNRFC2253": "",
+          "certFingerprintSHA1": ""
+        },
+        "tlsClientRandom": "",
+        "tlsClientHelloLength": "",
+        "colo": "SJC",
+        "timezone": "America/Los_Angeles",
+        "longitude": "-121.89496",
+        "latitude": "37.33939",
+        "edgeRequestKeepAliveStatus": 1,
+        "requestPriority": "",
+        "postalCode": "95025",
+        "city": "San Jose",
+        "tlsVersion": "",
+        "regionCode": "CA",
+        "asOrganization": "Cloudflare, Inc.",
+        "metroCode": "807",
+        "tlsClientExtensionsSha1Le": "",
+        "tlsClientExtensionsSha1": ""
+      }
+    },
+    "response": {
+      "status": 200
+    }
+  }
+}
