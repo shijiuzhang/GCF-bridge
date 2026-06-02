@@ -13,12 +13,12 @@
 - **Tool Calling** — 支持 Anthropic 工具调用格式
 - **SSE 流式输出** — 支持 streaming response
 
-## v1.6 更新内容
+## v1.61 更新内容
 
 ### Bug 修复
 
 - **修复 Edit 工具参数解析损坏 (v1e 始终为 -1)** — 修复了 `repairToolJson` 中由于 `lastIndexOf` 误用导致 `old_string` 和 `new_string` 截断错误的严重 bug。
-- **修复容错解析中字符串值尾部引号残留** — 新增 `stripTrailingJsonQuote` 统一剥离修复值尾部的双引号和花括号，解决了 `Bash` 执行尾部引号报错（如 `ls"`）和 `Write` 写入文件内容损坏的问题。
+- **修复容错解析中字符串值尾部引号残留 (且保护截断文本)** — 引入基于正则表达式的 `stripTrailingJsonQuote` 统一剥离修复值尾部的双引号和花括号，解决了 `Bash` 执行尾部引号报错（如 `ls"`）和 `Write` 写入文件内容损坏的问题，并保证了截断文本不会被误删花括号。
 - **修复流式响应中删除所有空格和换行** — 分离了流式清洗与最终整理逻辑，在流式传输时不再对 chunk 进行 `.trim()` 处理，完整保留了词间空格和换行符。
 - **修复 Workers 模式下的多轮对话上下文丢失** — 将单条消息逻辑替换为完整的会话历史 prompt，并接入 `truncateToolResult` 智能裁剪工具输出以防触发 Google 安全过滤；同时基于客户端 API Key 隔离 session 会话。
 - **实现标准的 SSE 流式工具调用输出** — 客户端流式调用时，自动缓冲 `<TOOL_CALL>` 段并按 Anthropic SSE 格式输出 `tool_use`、`input_json_delta` 和 `content_block_stop` 事件，使得 Claude Code 能完美唤起并执行本地工具。
@@ -107,12 +107,12 @@ MIT
 - **Tool Calling** — supports Anthropic tool calling format
 - **SSE streaming** — streaming response support
 
-## v1.6 Changelog
+## v1.61 Changelog
 
 ### Bug Fixes
 
 - **Fix Edit tool parameter extraction (v1e evaluated to -1)** — Fixed a critical bug in `repairToolJson` where incorrect arguments to `lastIndexOf` truncated and corrupted the `old_string` and `new_string` parameters.
-- **Fix trailing double-quotes in custom repaired string values** — Added a unified `stripTrailingJsonQuote` helper to strip trailing quotes and braces, preventing trailing quote syntax errors in `Bash` (e.g. `ls"`) and text file writing.
+- **Fix trailing double-quotes in custom repaired string values (with truncation safety)** — Replaced the loop-based stripper with a robust regex-based `stripTrailingJsonQuote` to safely strip trailing quotes and braces, preventing trailing quote syntax errors in `Bash` (e.g. `ls"`) and text file writing while protecting truncated values.
 - **Fix streaming response dropping spaces and newlines** — Decoupled chunk cleaning from final output trimming by removing `.trim()` on streamed chunks, fully preserving word spacing and newlines.
 - **Fix context history loss and session collision in Cloudflare Workers** — Replaced single-message context with full conversation history prompting, integrated `truncateToolResult` to avoid Google safety filters, and isolated KV sessions per API Key.
 - **Support structured SSE streaming tool calls** — Refactored `handleStream` to buffer `<TOOL_CALL>` chunks and emit standard Anthropic SSE `tool_use`, `input_json_delta`, and `content_block_stop` events, enabling Claude Code to invoke local tools during streaming.
@@ -201,12 +201,12 @@ MIT
 - **Tool Calling** — unterstützt das Anthropic-Tool-Calling-Format
 - **SSE Streaming** — Streaming-Antworten werden unterstützt
 
-## v1.6 Änderungen
+## v1.61 Änderungen
 
 ### Fehlerbehebungen
 
 - **Fehler beim Parsen von Edit-Parametern behoben (v1e ergibt -1)** — Ein kritischer Fehler in `repairToolJson` wurde behoben, bei dem falsche Parameter für `lastIndexOf` die Parameter `old_string` und `new_string` beschädigten.
-- **Verbleibende Anführungszeichen am Ende reparierter Werte entfernt** — Neuer Helper `stripTrailingJsonQuote` entfernt schließende Klammern und Anführungszeichen, wodurch Syntaxfehler bei `Bash` (z.B. `ls"`) und `Write` behoben wurden.
+- **Verbleibende Anführungszeichen am Ende reparierter Werte entfernt (mit Absicherung)** — Helper `stripTrailingJsonQuote` nutzt nun Regex, um schließende Klammern und Anführungszeichen zu entfernen, wodurch Syntaxfehler bei `Bash` (z.B. `ls"`) und `Write` behoben wurden und unvollständige Werte unversehrt bleiben.
 - **Fehlende Leerzeichen und Zeilenumbrüche beim Streaming behoben** — Chunk-Bereinigung von Trimming entkoppelt, `.trim()` bei Stream-Chunks entfernt, um Wortabstände und Zeilenumbrüche zu erhalten.
 - **Kontexthistorienverlust und Sitzungskollisionen in Cloudflare Workers behoben** — Einzelnachrichten-Kontext durch vollständigen Gesprächsverlauf ersetzt, `truncateToolResult` integriert und KV-Sitzungen pro API-Key isoliert.
 - **Standardisierte SSE-Streaming-Tool-Aufrufe implementiert** — Stream-Verarbeitung puffert `<TOOL_CALL>`-Blöcke und gibt Anthropic-kompatible SSE-Events (`tool_use`, `input_json_delta`, `content_block_stop`) aus, damit Claude Code lokale Tools aufrufen kann.
