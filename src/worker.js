@@ -59,6 +59,15 @@ async function handleAnthropicMessages(request, env) {
 
   const session = await getSession(env, sessionId);
 
+  // If a new conversation starts (only 1 message), reset session state to avoid duplicate signature matches
+  if (messages.length === 1) {
+    session.lastBlocks = [];
+    session.pendingToolIds = [];
+    session.toolRedeliveryCount = 0;
+    session.messageCount = 0;
+    session.lastToolResponse = null;
+  }
+
   const sysPrompt = extractSystemPrompt(body.system);
   const toolsPrompt = buildToolsPrompt(body.tools);
 
@@ -72,12 +81,20 @@ async function handleAnthropicMessages(request, env) {
     if (session.pendingToolIds.length && session.toolRedeliveryCount < MAX_TOOL_REDELIVERY) {
       session.toolRedeliveryCount++;
       await saveSession(env, sessionId, session);
-      return jsonResp(session.lastToolResponse || { id: msgId, type: "message", role: "assistant", content: [{ type: "text", text: "Standing by." }], model: modelInfo.name, stop_reason: "end_turn", usage: { input_tokens: 0, output_tokens: 0 } });
+      const respObj = session.lastToolResponse || { id: msgId, type: "message", role: "assistant", content: [{ type: "text", text: "Standing by." }], model: modelInfo.name, stop_reason: "end_turn", usage: { input_tokens: 0, output_tokens: 0 } };
+      if (stream) {
+        return sseResp(createStaticStream(respObj));
+      }
+      return jsonResp(respObj);
     }
     session.pendingToolIds = [];
     session.toolRedeliveryCount = 0;
     await saveSession(env, sessionId, session);
-    return jsonResp({ id: msgId, type: "message", role: "assistant", content: [{ type: "text", text: "Standing by." }], model: modelInfo.name, stop_reason: "end_turn", usage: { input_tokens: 0, output_tokens: 0 } });
+    const respObj = { id: msgId, type: "message", role: "assistant", content: [{ type: "text", text: "Standing by." }], model: modelInfo.name, stop_reason: "end_turn", usage: { input_tokens: 0, output_tokens: 0 } };
+    if (stream) {
+      return sseResp(createStaticStream(respObj));
+    }
+    return jsonResp(respObj);
   }
 
   // Construct prompt from full history, truncating tool results to respect token limits
@@ -139,6 +156,29 @@ function createStream(modelInfo, prompt, msgId, session, sessionId, env) {
         for await (const chunk of handleStream(modelInfo, prompt, msgId, session, sessionId, env)) {
           controller.enqueue(encoder.encode(chunk));
         }
+      } catch (e) {
+        controller.error(e);
+      }
+      controller.close();
+    },
+  });
+}
+
+function createStaticStream(respObj) {
+  const encoder = new TextEncoder();
+  return new ReadableStream({
+    async start(controller) {
+      try {
+        controller.enqueue(encoder.encode(openSseEvents(respObj.id, respObj.model)));
+        controller.enqueue(encoder.encode(contentBlockStart(0)));
+        const text = respObj.content.filter(b => b.type === "text").map(b => b.text).join("");
+        if (text) {
+          controller.enqueue(encoder.encode(contentBlockDelta(0, text)));
+        }
+        controller.enqueue(encoder.encode(contentBlockStop(0)));
+        controller.enqueue(encoder.encode(messageDelta(respObj.stop_reason)));
+        controller.enqueue(encoder.encode(messageStop()));
+        controller.enqueue(encoder.encode("data: [DONE]\n\n"));
       } catch (e) {
         controller.error(e);
       }

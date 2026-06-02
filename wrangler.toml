@@ -5,4 +5,4 @@ compatibility_flags = ["nodejs_compat"]
 
 [[kv_namespaces]]
 binding = "SESSION_KV"
-id = "YOUR_KV_NAMESPACE_ID"
+id = "cd2d5d1730084895977f352abe97f50f"
