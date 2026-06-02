@@ -337,11 +337,46 @@ async function handleChatCompletions(request) {
 }
 
 function handleModelsList() {
+  const anthropicModels = [
+    { id: "claude-3-5-sonnet-20241022", display_name: "Claude 3.5 Sonnet", desc: "Claude 3.5 Sonnet" },
+    { id: "claude-3-5-sonnet-latest", display_name: "Claude 3.5 Sonnet (Latest)", desc: "Claude 3.5 Sonnet" },
+    { id: "claude-3-5-haiku-20241022", display_name: "Claude 3.5 Haiku", desc: "Claude 3.5 Haiku" },
+    { id: "claude-3-5-haiku-latest", display_name: "Claude 3.5 Haiku (Latest)", desc: "Claude 3.5 Haiku" },
+    { id: "claude-3-opus-20240229", display_name: "Claude 3 Opus", desc: "Claude 3 Opus" },
+  ];
+
+  const list = [];
+  for (const [name, cfg] of Object.entries(MODELS)) {
+    list.push({
+      id: name,
+      object: "model",
+      type: "model",
+      display_name: name,
+      created: 1700000000,
+      created_at: "2024-01-01T00:00:00Z",
+      owned_by: "google",
+      description: cfg.desc,
+    });
+  }
+  for (const m of anthropicModels) {
+    list.push({
+      id: m.id,
+      object: "model",
+      type: "model",
+      display_name: m.display_name,
+      created: 1700000000,
+      created_at: "2024-01-01T00:00:00Z",
+      owned_by: "anthropic",
+      description: m.desc,
+    });
+  }
+
   return jsonResp({
     object: "list",
-    data: Object.entries(MODELS).map(([name, cfg]) => ({
-      id: name, object: "model", created: 1700000000, owned_by: "google", description: cfg.desc,
-    })),
+    data: list,
+    has_more: false,
+    first_id: list[0]?.id,
+    last_id: list[list.length - 1]?.id
   });
 }
 
