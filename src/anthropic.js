@@ -34,16 +34,7 @@ function extractSystemPrompt(system) {
 
 function stripTrailingJsonQuote(val) {
   val = (val || "").trim();
-  if (val.endsWith("</TOOL_CALL>")) {
-    val = val.slice(0, -12).trim();
-  }
-  while (val.endsWith("}")) {
-    val = val.slice(0, -1).trim();
-  }
-  if (val.endsWith('"')) {
-    val = val.slice(0, -1);
-  }
-  return val;
+  return val.replace(/"\s*}*\s*(?:<\/TOOL_CALL>)?\s*$/, "");
 }
 
 function repairToolJson(raw) {
