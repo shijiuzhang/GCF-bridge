@@ -202,7 +202,11 @@ function sanitizePrompt(text) {
     .replace(/端口映射/g, "流量映射")
     .replace(/香港/g, "东京")
     .replace(/Hong Kong/gi, "Tokyo")
-    .replace(/HongKong/gi, "Tokyo");
+    .replace(/HongKong/gi, "Tokyo")
+    .replace(/<system-reminder>/g, "[system-reminder]")
+    .replace(/<\/system-reminder>/g, "[/system-reminder]")
+    .replace(/<user-prompt-submit-hook>/g, "[user-prompt-submit-hook]")
+    .replace(/<\/user-prompt-submit-hook>/g, "[/user-prompt-submit-hook]");
 }
 
 export {

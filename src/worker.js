@@ -128,6 +128,7 @@ async function handleAnthropicMessages(request, env) {
   }
   const historyText = parts.join("\n\n");
   const prompt = sanitizePrompt(`[SYSTEM INSTRUCTIONS]\n${sysPrompt}\n\n${toolsPrompt}\n[CONVERSATION HISTORY]\n${historyText}`.replace(/\n{3,}/g, "\n\n").trim());
+  session.lastPrompt = prompt;
 
   if (stream) {
     return sseResp(createStream(modelInfo, prompt, msgId, session, sessionId, env));

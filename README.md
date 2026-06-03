@@ -13,6 +13,13 @@
 - **Tool Calling** — 支持 Anthropic 工具调用格式
 - **SSE 流式输出** — 支持 streaming response
 
+## v1.84 更新内容
+
+### Bug 修复
+
+- **解决系统提示词中裸 XML 标签触发的 Gemini 隐式安全拒答** — 诊断发现，Claude Code 发送的系统提示词中包含 `<system-reminder>` 和 `<user-prompt-submit-hook>` 等未闭合的裸 XML 标签。Gemini 在文本层面对此类标签极其敏感，会判定为潜在的提示词注入/绕过攻击，从而直接在应答文本中输出 `"I cannot fulfill this request."`。我们在 `sanitizePrompt` 中引入了自动过滤与转义机制，将这些标签动态替换为中括号安全表示（如 `[system-reminder]`），彻底打通了多轮对话和复杂指令的无阻碍流式传输。
+- **引入 Prompt 调试持久化机制** — 在 `worker.js` 的 session 状态中增加了 `lastPrompt` 属性，持久化记录发送到 Gemini 的最终 prompt 内容，以供未来的安全排查和调试使用。
+
 ## v1.83 更新内容
 
 ### Bug 修复
