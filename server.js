@@ -1,7 +1,7 @@
 import { MODELS, DEFAULT_MODEL, resolveModel, generateId, MAX_TOOL_REDELIVERY, truncateToolResult } from "./src/config.js";
 import { sendToGemini, extractResponseText, streamGeminiResponse } from "./src/gemini.js";
 import { contentToBlocks } from "./src/delta.js";
-import { extractSystemPrompt, buildToolsPrompt, parseToolCalls } from "./src/anthropic.js";
+import { extractSystemPrompt, buildToolsPrompt, parseToolCalls, stripSystemReminders } from "./src/anthropic.js";
 import http from "node:http";
 
 function corsHeaders() {
@@ -39,7 +39,7 @@ function sendMessagesHandler(res, body) {
   const parts = [];
   for (const msg of messages) {
     const role = msg.role || "user";
-    const content = typeof msg.content === "string" ? msg.content : (Array.isArray(msg.content) ? msg.content.filter(c => c.type === "text").map(c => c.text).join(" ") : "");
+    const content = typeof msg.content === "string" ? stripSystemReminders(msg.content) : (Array.isArray(msg.content) ? msg.content.filter(c => c.type === "text").map(c => stripSystemReminders(c.text)).join(" ") : "");
     if (role === "system") parts.push(`[System instruction]: ${content}`);
     else if (role === "assistant") parts.push(`[Assistant]: ${content}`);
     else parts.push(content);
@@ -71,7 +71,7 @@ async function handleStreamHTTP(res, modelInfo, messages, reqData) {
     let text = "";
     for (const b of blocks) {
       if (b.type === "text") {
-        text += (b.text || "") + "\n";
+        text += stripSystemReminders(b.text || "") + "\n";
       } else if (b.type === "tool_use") {
         text += `\n[You requested Tool: ${b.name}]\n`;
       } else if (b.type === "tool_result") {

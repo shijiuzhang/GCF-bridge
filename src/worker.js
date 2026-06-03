@@ -2,6 +2,7 @@ import { MODELS, DEFAULT_MODEL, resolveModel, generateId, MAX_TOOL_REDELIVERY, t
 import { sendToGemini, extractResponseText, streamGeminiResponse } from "./gemini.js";
 import { getSession, saveSession, contentToBlocks, blockSignatures, computeDelta } from "./delta.js";
 import {
+  stripSystemReminders,
   buildToolsPrompt,
   extractSystemPrompt,
   buildAnthropicResponse,
@@ -110,7 +111,7 @@ async function handleAnthropicMessages(request, env) {
     let text = "";
     for (const b of blocks) {
       if (b.type === "text") {
-        text += (b.text || "") + "\n";
+        text += stripSystemReminders(b.text || "") + "\n";
       } else if (b.type === "tool_use") {
         text += `\n[You requested Tool: ${b.name}]\n`;
       } else if (b.type === "tool_result") {
