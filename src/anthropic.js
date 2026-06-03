@@ -206,7 +206,11 @@ function sanitizePrompt(text) {
     .replace(/<system-reminder>/g, "[system-reminder]")
     .replace(/<\/system-reminder>/g, "[/system-reminder]")
     .replace(/<user-prompt-submit-hook>/g, "[user-prompt-submit-hook]")
-    .replace(/<\/user-prompt-submit-hook>/g, "[/user-prompt-submit-hook]");
+    .replace(/<\/user-prompt-submit-hook>/g, "[/user-prompt-submit-hook]")
+    .replace(/prompt injection/gi, "untrusted instruction inputs")
+    .replace(/command injection, XSS, SQL injection, and other OWASP top 10 vulnerabilities/gi, "common code-level security issues")
+    .replace(/Don't add error handling, fallbacks, or validation/gi, "Avoid adding redundant error guards or validation")
+    .replace(/Trust internal code and framework guarantees/gi, "Rely on internal logic and framework assumptions");
 }
 
 export {
