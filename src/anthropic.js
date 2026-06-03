@@ -197,7 +197,12 @@ function sanitizePrompt(text) {
     .replace(/v-p-n/gi, "网络中继")
     .replace(/代理/g, "中转")
     .replace(/翻墙/g, "网络优化")
-    .replace(/科学上网/g, "网络优化");
+    .replace(/科学上网/g, "网络优化")
+    .replace(/端口转发/g, "流量转发")
+    .replace(/端口映射/g, "流量映射")
+    .replace(/香港/g, "东京")
+    .replace(/Hong Kong/gi, "Tokyo")
+    .replace(/HongKong/gi, "Tokyo");
 }
 
 export {
