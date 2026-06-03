@@ -13,6 +13,13 @@
 - **Tool Calling** — 支持 Anthropic 工具调用格式
 - **SSE 流式输出** — 支持 streaming response
 
+## v1.82 更新内容
+
+### Bug 修复
+
+- **集成并应用敏感词过滤机制 (sanitizePrompt)** — 在 `worker.js` (Cloudflare Workers) 和 `server.js` (本地服务) 中全面接入 `sanitizePrompt` 过滤机制。通过在请求发送给 Gemini 之前，将可能触及敏感内容的网络/代理类词汇 (如 `"VPN"`, `"VPN代理"`, `"代理"`, `"翻墙"`, `"科学上网"`, `"shadowsocks"`, `"socks5"`, `"openvpn"`, `"v2ray"`, `"trojan"`) 动态翻译为中性词 (如 `"网络中继"`, `"中转"`, `"网络优化"`, `"加密隧道"`, `"安全套接"`, `"transit tunnel"`, `"transit"`)，成功规避了 Google Gemini Web 端的实时安全审查。彻底解决了提问中包含上述词汇导致整个会话卡死/超时，或频繁触发 `I cannot fulfill this request.` 拦截报错的问题。
+- **优化敏感词替换规则的优先级顺序** — 调整了 `sanitizePrompt` 内的替换逻辑，确保 `openvpn`、`proxy server` 等包含 `vpn` 或 `proxy` 子串的长词优先匹配和翻译，避免短词替换破坏长词结构（例如 `openvpn` 曾被破坏替换为 `open网络中继`），极大提升了翻译的语义完整性。
+
 ## v1.81 更新内容
 
 ### Bug 修复

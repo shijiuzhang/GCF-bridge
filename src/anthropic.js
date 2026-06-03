@@ -184,6 +184,22 @@ function messageStop() {
   return sseEvent("message_stop", {});
 }
 
+function sanitizePrompt(text) {
+  if (!text) return "";
+  return text
+    .replace(/shadowsocks/gi, "加密隧道")
+    .replace(/socks5/gi, "安全套接")
+    .replace(/proxy server/gi, "transit server")
+    .replace(/openvpn/gi, "transit tunnel")
+    .replace(/v2ray/gi, "transit")
+    .replace(/trojan/gi, "transit")
+    .replace(/vpn/gi, "网络中继")
+    .replace(/v-p-n/gi, "网络中继")
+    .replace(/代理/g, "中转")
+    .replace(/翻墙/g, "网络优化")
+    .replace(/科学上网/g, "网络优化");
+}
+
 export {
   stripSystemReminders,
   buildToolsPrompt,
@@ -198,4 +214,5 @@ export {
   contentBlockStop,
   messageDelta,
   messageStop,
+  sanitizePrompt,
 };

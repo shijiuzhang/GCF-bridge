@@ -1,7 +1,7 @@
 import { MODELS, DEFAULT_MODEL, resolveModel, generateId, MAX_TOOL_REDELIVERY, truncateToolResult } from "./src/config.js";
 import { sendToGemini, extractResponseText, streamGeminiResponse } from "./src/gemini.js";
 import { contentToBlocks } from "./src/delta.js";
-import { extractSystemPrompt, buildToolsPrompt, parseToolCalls, stripSystemReminders } from "./src/anthropic.js";
+import { extractSystemPrompt, buildToolsPrompt, parseToolCalls, stripSystemReminders, sanitizePrompt } from "./src/anthropic.js";
 import http from "node:http";
 
 function corsHeaders() {
@@ -44,7 +44,7 @@ function sendMessagesHandler(res, body) {
     else if (role === "assistant") parts.push(`[Assistant]: ${content}`);
     else parts.push(content);
   }
-  const prompt = parts.join("\n\n");
+  const prompt = sanitizePrompt(parts.join("\n\n"));
 
   sendToGemini(prompt, modelInfo.mode, modelInfo.think)
     .then(raw => {
@@ -86,7 +86,7 @@ async function handleStreamHTTP(res, modelInfo, messages, reqData) {
     else parts.push(text);
   }
   const historyText = parts.join("\n\n");
-  const prompt = `[SYSTEM INSTRUCTIONS]\n${sysPrompt}\n\n${toolsPrompt}\n[CONVERSATION HISTORY]\n${historyText}`.replace(/\n{3,}/g, "\n\n").trim();
+  const prompt = sanitizePrompt(`[SYSTEM INSTRUCTIONS]\n${sysPrompt}\n\n${toolsPrompt}\n[CONVERSATION HISTORY]\n${historyText}`.replace(/\n{3,}/g, "\n\n").trim());
 
   const msgId = `msg_${generateId("")}`;
 
@@ -174,7 +174,7 @@ function handleChatCompletions(res, body) {
     else if (role === "assistant") parts.push(`[Assistant]: ${content}`);
     else parts.push(content);
   }
-  const prompt = parts.join("\n\n");
+  const prompt = sanitizePrompt(parts.join("\n\n"));
 
   if (reqData.stream) {
     res.writeHead(200, {

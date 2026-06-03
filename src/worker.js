@@ -14,6 +14,7 @@ import {
   contentBlockStop,
   messageDelta,
   messageStop,
+  sanitizePrompt,
 } from "./anthropic.js";
 
 function corsHeaders() {
@@ -126,7 +127,7 @@ async function handleAnthropicMessages(request, env) {
     else parts.push(text);
   }
   const historyText = parts.join("\n\n");
-  const prompt = `[SYSTEM INSTRUCTIONS]\n${sysPrompt}\n\n${toolsPrompt}\n[CONVERSATION HISTORY]\n${historyText}`.replace(/\n{3,}/g, "\n\n").trim();
+  const prompt = sanitizePrompt(`[SYSTEM INSTRUCTIONS]\n${sysPrompt}\n\n${toolsPrompt}\n[CONVERSATION HISTORY]\n${historyText}`.replace(/\n{3,}/g, "\n\n").trim());
 
   if (stream) {
     return sseResp(createStream(modelInfo, prompt, msgId, session, sessionId, env));
@@ -293,7 +294,7 @@ async function handleChatCompletions(request) {
     else if (role === "assistant") parts.push(`[Assistant]: ${content}`);
     else parts.push(content);
   }
-  const prompt = parts.join("\n\n");
+  const prompt = sanitizePrompt(parts.join("\n\n"));
 
   const cid = `chatcmpl-${generateId("")}`;
 
