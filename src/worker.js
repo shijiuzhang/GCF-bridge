@@ -16,6 +16,7 @@ import {
   messageStop,
   sanitizePrompt,
 } from "./anthropic.js";
+import { buildPersona } from "./persona.js";
 
 function corsHeaders() {
   return {
@@ -127,7 +128,8 @@ async function handleAnthropicMessages(request, env) {
     else parts.push(text);
   }
   const historyText = parts.join("\n\n");
-  const prompt = sanitizePrompt(`[SYSTEM INSTRUCTIONS]\n${sysPrompt}\n\n${toolsPrompt}\n[CONVERSATION HISTORY]\n${historyText}`.replace(/\n{3,}/g, "\n\n").trim());
+  const persona = buildPersona();
+  const prompt = sanitizePrompt(`[CORE PERSONA]\n${persona}\n\n[SYSTEM INSTRUCTIONS]\n${sysPrompt}\n\n${toolsPrompt}\n[CONVERSATION HISTORY]\n${historyText}`.replace(/\n{3,}/g, "\n\n").trim());
   session.lastPrompt = prompt;
 
   if (stream) {
@@ -295,7 +297,7 @@ async function handleChatCompletions(request) {
     else if (role === "assistant") parts.push(`[Assistant]: ${content}`);
     else parts.push(content);
   }
-  const prompt = sanitizePrompt(parts.join("\n\n"));
+  const prompt = sanitizePrompt(`[CORE PERSONA]\n${buildPersona()}\n\n${parts.join("\n\n")}`);
 
   const cid = `chatcmpl-${generateId("")}`;
 

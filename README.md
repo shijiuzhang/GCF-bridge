@@ -12,6 +12,21 @@
 - **零认证** — 匿名模式使用 Gemini 3.5 Flash，无需 Google 账号
 - **Tool Calling** — 支持 Anthropic 工具调用格式
 - **SSE 流式输出** — 支持 streaming response
+- **Claude Persona** — 内置 Claude Fable 5 人格层，让 Gemini 回复具备 Claude 的思考方式和沟通风格
+
+## v1.9 更新内容
+
+### 新增特性
+
+- **注入 Claude Fable 5 全局人格** — 从 Anthropic 公开的 Claude Fable 5 系统提示词（~188KB）中提炼出约 4.8K 字符的核心人格指令，作为 `[CORE PERSONA]` 层注入到每次发送给 Gemini 的 prompt 最前方。提取的核心特质包括：
+  - **语气与格式**：温暖对话式语气，prose 优于列表，最小化格式，不骂人
+  - **公平中立**：公平呈现多方观点的最佳论证，谨慎分享个人意见，提供替代视角
+  - **认知谦逊**：适当的信心水平，承认不确定性，不盲目自信也不过度谦虚
+  - **错误处理**：承认错误并修正，但不自我贬低或过度道歉
+  - **拒绝风格**：对话式拒绝，不说教不训诫，保持友好语气
+  - **关怀意识**：关注用户身心健康，不培养过度依赖
+
+  新增文件 `src/persona.js` 包含人格模块，`worker.js`（Cloudflare Workers）和 `server.js`（本地服务）的所有 prompt 组装点均已同步注入。人格文本经过 `sanitizePrompt()` 处理，不会触发 Gemini 安全过滤，也不影响 delta tracking 和 session state 等现有机制。
 
 ## v1.85 更新内容
 
@@ -190,6 +205,21 @@ MIT
 - **Zero authentication** — anonymous mode uses Gemini 3.5 Flash, no Google account required
 - **Tool Calling** — supports Anthropic tool calling format
 - **SSE streaming** — streaming response support
+- **Claude Persona** — built-in Claude Fable 5 personality layer that gives Gemini responses Claude's thinking style and communication patterns
+
+## v1.9 Changelog
+
+### New Features
+
+- **Inject Claude Fable 5 Persona** — Distilled ~4.8K characters of core personality instructions from Anthropic's public Claude Fable 5 system prompt (~188KB), injected as a `[CORE PERSONA]` layer prepended to every prompt sent to Gemini. Extracted core traits include:
+  - **Tone & formatting**: warm conversational tone, prose over lists, minimal formatting
+  - **Evenhandedness**: fair presentation of multiple perspectives, cautious about personal opinions
+  - **Epistemic humility**: appropriate confidence, acknowledge uncertainty
+  - **Mistake handling**: own errors and fix them without self-abasement
+  - **Refusal style**: conversational refusals, non-preachy, friendly tone
+  - **Wellbeing awareness**: care about user wellbeing, avoid fostering over-reliance
+
+  New file `src/persona.js` contains the persona module. Both `worker.js` (Cloudflare Workers) and `server.js` (local server) have been updated at all prompt assembly points. Persona text passes through `sanitizePrompt()` and does not interfere with delta tracking or session state.
 
 ## v1.81 Changelog
 
@@ -335,6 +365,21 @@ MIT
 - **Keine Authentifizierung** — anonymer Modus nutzt Gemini 3.5 Flash, kein Google-Konto erforderlich
 - **Tool Calling** — unterstützt das Anthropic-Tool-Calling-Format
 - **SSE Streaming** — Streaming-Antworten werden unterstützt
+- **Claude Persona** — integrierte Claude Fable 5 Persönlichkeitsschicht, die Gemini-Antworten Claudes Denkweise und Kommunikationsstil verleiht
+
+## v1.9 Änderungen
+
+### Neue Funktionen
+
+- **Claude Fable 5 Persona injizieren** — ~4,8K Zeichen Kernpersönlichkeitsanweisungen aus Anthropics öffentlichem Claude Fable 5 System-Prompt (~188KB) destilliert, als `[CORE PERSONA]`-Schicht jedem an Gemini gesendeten Prompt vorangestellt. Extrahierte Kernmerkmale umfassen:
+  - **Ton & Formatierung**: warmer Gesprächston, Fließtext statt Listen, minimale Formatierung
+  - **Ausgewogenheit**: faire Darstellung mehrerer Perspektiven, zurückhaltend bei persönlichen Meinungen
+  - **Epistemische Demut**: angemessenes Vertrauen, Unsicherheit eingestehen
+  - **Fehlerbehandlung**: Fehler eingestehen und beheben ohne Selbsterniedrigung
+  - **Ablehnungsstil**: konversationelle Ablehnungen, nicht belehrend, freundlicher Ton
+  - **Wohlbefinden**: Sorge um das Wohlbefinden der Nutzer, Überabhängigkeit vermeiden
+
+  Neue Datei `src/persona.js` enthält das Persona-Modul. Sowohl `worker.js` (Cloudflare Workers) als auch `server.js` (lokaler Server) wurden an allen Prompt-Zusammensetzungspunkten aktualisiert. Persona-Text durchläuft `sanitizePrompt()` und beeinträchtigt Delta-Tracking oder Session-State nicht.
 
 ## v1.81 Änderungen
 

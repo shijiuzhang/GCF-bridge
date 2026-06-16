@@ -2,6 +2,7 @@ import { MODELS, DEFAULT_MODEL, resolveModel, generateId, MAX_TOOL_REDELIVERY, t
 import { sendToGemini, extractResponseText, streamGeminiResponse } from "./src/gemini.js";
 import { contentToBlocks } from "./src/delta.js";
 import { extractSystemPrompt, buildToolsPrompt, parseToolCalls, stripSystemReminders, sanitizePrompt } from "./src/anthropic.js";
+import { buildPersona } from "./src/persona.js";
 import http from "node:http";
 
 function corsHeaders() {
@@ -44,7 +45,7 @@ function sendMessagesHandler(res, body) {
     else if (role === "assistant") parts.push(`[Assistant]: ${content}`);
     else parts.push(content);
   }
-  const prompt = sanitizePrompt(parts.join("\n\n"));
+  const prompt = sanitizePrompt(`[CORE PERSONA]\n${buildPersona()}\n\n${parts.join("\n\n")}`);
 
   sendToGemini(prompt, modelInfo.mode, modelInfo.think)
     .then(raw => {
@@ -86,7 +87,8 @@ async function handleStreamHTTP(res, modelInfo, messages, reqData) {
     else parts.push(text);
   }
   const historyText = parts.join("\n\n");
-  const prompt = sanitizePrompt(`[SYSTEM INSTRUCTIONS]\n${sysPrompt}\n\n${toolsPrompt}\n[CONVERSATION HISTORY]\n${historyText}`.replace(/\n{3,}/g, "\n\n").trim());
+  const persona = buildPersona();
+  const prompt = sanitizePrompt(`[CORE PERSONA]\n${persona}\n\n[SYSTEM INSTRUCTIONS]\n${sysPrompt}\n\n${toolsPrompt}\n[CONVERSATION HISTORY]\n${historyText}`.replace(/\n{3,}/g, "\n\n").trim());
 
   const msgId = `msg_${generateId("")}`;
 
@@ -174,7 +176,7 @@ function handleChatCompletions(res, body) {
     else if (role === "assistant") parts.push(`[Assistant]: ${content}`);
     else parts.push(content);
   }
-  const prompt = sanitizePrompt(parts.join("\n\n"));
+  const prompt = sanitizePrompt(`[CORE PERSONA]\n${buildPersona()}\n\n${parts.join("\n\n")}`);
 
   if (reqData.stream) {
     res.writeHead(200, {
