@@ -17,6 +17,7 @@ import {
   sanitizePrompt,
 } from "./anthropic.js";
 import { buildPersona } from "./persona.js";
+import { handleMonitor, getHealthStatus } from "./monitor.js";
 
 function corsHeaders() {
   return {
@@ -395,7 +396,7 @@ function handleModelsList() {
 }
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     if (request.method === "OPTIONS") {
       return new Response(null, { status: 204, headers: corsHeaders() });
     }
@@ -410,6 +411,11 @@ export default {
       return jsonResp({ status: "ok", version: "1.0.0", models: Object.keys(MODELS) });
     }
 
+    if (path === "/health" && request.method === "GET") {
+      const health = await getHealthStatus(env);
+      return jsonResp(health);
+    }
+
     if (path === "/v1/models" || path === "/v1beta/models") return handleModelsList();
 
     if (path === "/v1/messages" && request.method === "POST") return handleAnthropicMessages(request, env);
@@ -419,5 +425,9 @@ export default {
     if (path === "/v1/chat/completions" && request.method === "POST") return handleChatCompletions(request);
 
     return jsonResp({ error: "not found" }, 404);
+  },
+
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(handleMonitor(env));
   },
 };

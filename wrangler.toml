@@ -6,3 +6,11 @@ compatibility_flags = ["nodejs_compat"]
 [[kv_namespaces]]
 binding = "SESSION_KV"
 id = "cd2d5d1730084895977f352abe97f50f"
+
+[triggers]
+crons = ["*/30 * * * *"]
+
+[vars]
+PUSHPLUS_TOKEN = ""
+RESEND_API_KEY = ""
+NOTIFY_EMAIL = ""
