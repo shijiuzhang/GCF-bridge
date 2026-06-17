@@ -408,7 +408,7 @@ export default {
     }
 
     if (path === "/" && request.method === "GET") {
-      return jsonResp({ status: "ok", version: "1.0.0", models: Object.keys(MODELS) });
+      return jsonResp({ status: "ok", version: "1.91.0", models: Object.keys(MODELS) });
     }
 
     if (path === "/health" && request.method === "GET") {

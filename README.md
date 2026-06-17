@@ -13,6 +13,29 @@
 - **Tool Calling** — 支持 Anthropic 工具调用格式
 - **SSE 流式输出** — 支持 streaming response
 - **Claude Persona** — 内置 Claude Fable 5 人格层，让 Gemini 回复具备 Claude 的思考方式和沟通风格
+- **健康监控** — 定时检测 Gemini 端点状态，宕机时通过微信（PushPlus）和邮件（Resend）自动告警，恢复时自动通知
+
+## v1.91 更新内容
+
+### 新增特性
+
+- **Gemini 端点健康监控** — 利用 Cloudflare Cron Trigger 每 30 分钟自动检测 Gemini 端点可用性。检测逻辑包括 HTTP 响应状态、响应内容有效性、安全过滤拒答识别。健康状态持久化存储在 KV 中（key: `health:status`，TTL: 24h）。
+- **双通道告警通知** — 状态变化时同时通过 PushPlus（微信推送）和 Resend（邮件）两个渠道发送通知。仅在状态转换时通知（healthy→down 告警，down→healthy 恢复），持续异常不重复告警，避免刷屏。
+- **`GET /health` 端点** — 暴露当前 Gemini 健康状态，返回 JSON 包含 `status`（healthy/down/unknown）、`lastCheck`、`lastChange`、`failCount`、`reason` 等字段。
+- **`scheduled` handler** — 注册 Cloudflare Cron Trigger，`ctx.waitUntil` 确保监控任务在 Worker 超时前完成。
+
+### 配置方式
+
+需要通过 `wrangler secret` 设置以下环境变量：
+
+```bash
+wrangler secret put PUSHPLUS_TOKEN    # PushPlus 推送 token（从 pushplus.plus 获取）
+wrangler secret put RESEND_API_KEY    # Resend API key（从 resend.com 获取）
+wrangler secret put NOTIFY_EMAIL      # 接收告警邮件的邮箱地址
+```
+
+PushPlus 注册流程：微信扫码关注 "pushplus" 公众号 → 登录 pushplus.plus → 复制 token。
+Resend 注册流程：登录 resend.com → 注册账号 → 创建 API Key（免费版每月 3000 封，使用 `onboarding@resend.dev` 作为发件人无需配置域名）。
 
 ## v1.9 更新内容
 
@@ -206,6 +229,26 @@ MIT
 - **Tool Calling** — supports Anthropic tool calling format
 - **SSE streaming** — streaming response support
 - **Claude Persona** — built-in Claude Fable 5 personality layer that gives Gemini responses Claude's thinking style and communication patterns
+- **Health Monitoring** — Scheduled Gemini endpoint health checks with automatic alerts via WeChat (PushPlus) and email (Resend) on outage/recovery
+
+## v1.91 Changelog
+
+### New Features
+
+- **Gemini Endpoint Health Monitoring** — Uses Cloudflare Cron Triggers to check Gemini endpoint availability every 30 minutes. Health check logic includes HTTP response status, response content validation, and safety filter refusal detection. Health state is persisted in KV (key: `health:status`, TTL: 24h).
+- **Dual-Channel Alert Notifications** — Sends notifications via both PushPlus (WeChat) and Resend (email) on state transitions only (healthy→down for alerts, down→healthy for recovery). No repeated alerts during sustained outages to avoid notification spam.
+- **`GET /health` Endpoint** — Exposes current Gemini health status as JSON with fields: `status` (healthy/down/unknown), `lastCheck`, `lastChange`, `failCount`, `reason`.
+- **`scheduled` Handler** — Registers Cloudflare Cron Trigger with `ctx.waitUntil` to ensure monitoring tasks complete before Worker timeout.
+
+### Configuration
+
+Set the following environment variables via `wrangler secret`:
+
+```bash
+wrangler secret put PUSHPLUS_TOKEN    # PushPlus token (from pushplus.plus)
+wrangler secret put RESEND_API_KEY    # Resend API key (from resend.com)
+wrangler secret put NOTIFY_EMAIL      # Email address for alert notifications
+```
 
 ## v1.9 Changelog
 
@@ -366,6 +409,26 @@ MIT
 - **Tool Calling** — unterstützt das Anthropic-Tool-Calling-Format
 - **SSE Streaming** — Streaming-Antworten werden unterstützt
 - **Claude Persona** — integrierte Claude Fable 5 Persönlichkeitsschicht, die Gemini-Antworten Claudes Denkweise und Kommunikationsstil verleiht
+- **Gesundheitsüberwachung** — Geplante Gemini-Endpunkt-Checks mit automatischen Warnungen über WeChat (PushPlus) und E-Mail (Resend) bei Ausfällen/Wiederherstellungen
+
+## v1.91 Änderungen
+
+### Neue Funktionen
+
+- **Gemini-Endpunkt-Gesundheitsüberwachung** — Nutzt Cloudflare Cron Triggers, um die Verfügbarkeit des Gemini-Endpunkts alle 30 Minuten zu prüfen. Die Prüflogik umfasst HTTP-Antwortstatus, Inhaltsvalidierung und Erkennung von Sicherheitsfilter-Verweigerungen. Der Gesundheitszustand wird in KV gespeichert (Schlüssel: `health:status`, TTL: 24h).
+- **Zweikanal-Benachrichtigungen** — Sendet Benachrichtigungen über PushPlus (WeChat) und Resend (E-Mail) nur bei Zustandsübergängen (healthy→down für Warnungen, down→healthy für Wiederherstellung). Keine wiederholten Warnungen bei anhaltenden Ausfällen.
+- **`GET /health`-Endpunkt** — Gibt den aktuellen Gemini-Gesundheitsstatus als JSON zurück mit Feldern: `status` (healthy/down/unknown), `lastCheck`, `lastChange`, `failCount`, `reason`.
+- **`scheduled`-Handler** — Registriert Cloudflare Cron Trigger mit `ctx.waitUntil`, um sicherzustellen, dass Überwachungsaufgaben vor dem Worker-Timeout abgeschlossen werden.
+
+### Konfiguration
+
+Setzen Sie die folgenden Umgebungsvariablen über `wrangler secret`:
+
+```bash
+wrangler secret put PUSHPLUS_TOKEN    # PushPlus-Token (von pushplus.plus)
+wrangler secret put RESEND_API_KEY    # Resend-API-Schlüssel (von resend.com)
+wrangler secret put NOTIFY_EMAIL      # E-Mail-Adresse für Benachrichtigungen
+```
 
 ## v1.9 Änderungen
 
