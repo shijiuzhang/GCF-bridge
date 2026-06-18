@@ -1,193 +1,80 @@
+<div align="center">
+
 # GCF Bridge
 
-> **Gemini Cloudflare Workers → Anthropic API Proxy**
-> 将 Google Gemini 网页端转换为 Anthropic 兼容 API，部署在 Cloudflare Workers 上，专为 Claude Code 设计
+### Run Claude Code on free Gemini.
 
-## 特性
+**An Anthropic- & OpenAI-compatible API for Google Gemini's web interface — deployed on Cloudflare Workers, no API key, no server.**
 
-- **Cloudflare Workers 部署** — 全球边缘节点，无需本地服务器
-- **Anthropic API 兼容** — 直接对接 Claude Code，暴露 `/v1/messages` 端点
-- **OpenAI API 兼容** — 同时支持 `/v1/chat/completions`
-- **Delta Slicing** — 智能裁剪 Claude Code 的巨大上下文，避免触发 Google 安全过滤
-- **零认证** — 匿名模式使用 Gemini 3.5 Flash，无需 Google 账号
-- **Tool Calling** — 支持 Anthropic 工具调用格式
-- **SSE 流式输出** — 支持 streaming response
-- **Claude Persona** — 内置 Claude Fable 5 人格层，让 Gemini 回复具备 Claude 的思考方式和沟通风格
-- **健康监控** — 定时检测 Gemini 端点状态，宕机时通过微信（PushPlus）和邮件（Resend）自动告警，恢复时自动通知
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Platform](https://img.shields.io/badge/runs%20on-Cloudflare%20Workers-orange.svg)]()
+[![Compatible](https://img.shields.io/badge/API-Anthropic%20%7C%20OpenAI-8A2BE2.svg)]()
 
-## v1.91 更新内容
+**🌐 [English](#english) · [中文](#中文) · [Deutsch](#deutsch)**
 
-### 新增特性
+</div>
 
-- **Gemini 端点健康监控** — 利用 Cloudflare Cron Trigger 每 30 分钟自动检测 Gemini 端点可用性。检测逻辑包括 HTTP 响应状态、响应内容有效性、安全过滤拒答识别。健康状态持久化存储在 KV 中（key: `health:status`，TTL: 24h）。
-- **双通道告警通知** — 状态变化时同时通过 PushPlus（微信推送）和 Resend（邮件）两个渠道发送通知。仅在状态转换时通知（healthy→down 告警，down→healthy 恢复），持续异常不重复告警，避免刷屏。
-- **`GET /health` 端点** — 暴露当前 Gemini 健康状态，返回 JSON 包含 `status`（healthy/down/unknown）、`lastCheck`、`lastChange`、`failCount`、`reason` 等字段。
-- **`scheduled` handler** — 注册 Cloudflare Cron Trigger，`ctx.waitUntil` 确保监控任务在 Worker 超时前完成。
+---
 
-### 配置方式
+## <a id="english"></a>🇬🇧 English
 
-需要通过 `wrangler secret` 设置以下环境变量：
+<div align="center">
+  <img src="docs/architecture.en.png" alt="How GCF Bridge works: Claude Code sends an Anthropic request to GCF Bridge on a Cloudflare Worker, which translates the API, slims & sanitizes the prompt, repairs tool calls and streams back; Gemini (web) answers for free and the reply streams back to Claude Code." width="760">
+</div>
 
-```bash
-wrangler secret put PUSHPLUS_TOKEN    # PushPlus 推送 token（从 pushplus.plus 获取）
-wrangler secret put RESEND_API_KEY    # Resend API key（从 resend.com 获取）
-wrangler secret put NOTIFY_EMAIL      # 接收告警邮件的邮箱地址
-```
+### What is this?
 
-PushPlus 注册流程：微信扫码关注 "pushplus" 公众号 → 登录 pushplus.plus → 复制 token。
-Resend 注册流程：登录 resend.com → 注册账号 → 创建 API Key（免费版每月 3000 封，使用 `onboarding@resend.dev` 作为发件人无需配置域名）。
+GCF Bridge turns **Google Gemini's free web interface** into a drop-in **Anthropic API** (`/v1/messages`) and **OpenAI API** (`/v1/chat/completions`). Point [Claude Code](https://docs.anthropic.com/en/docs/claude-code) — or any Anthropic/OpenAI client — at your Worker, and it runs on Gemini.
 
-## v1.9 更新内容
+- **No Anthropic key.** No Google account either — Gemini is called in anonymous guest mode.
+- **No server.** Runs entirely on Cloudflare Workers' global edge.
+- **No browser automation.** Pure HTTP against the reverse-engineered `BardFrontendService` — no Playwright, no headless Chrome.
 
-### 新增特性
+The hard part isn't proxying requests — it's making Claude Code's massive, safety-sensitive prompts actually survive Gemini's consumer-web filters. That's what GCF Bridge is really for.
 
-- **注入 Claude Fable 5 全局人格** — 从 Anthropic 公开的 Claude Fable 5 系统提示词（~188KB）中提炼出约 4.8K 字符的核心人格指令，作为 `[CORE PERSONA]` 层注入到每次发送给 Gemini 的 prompt 最前方。提取的核心特质包括：
-  - **语气与格式**：温暖对话式语气，prose 优于列表，最小化格式，不骂人
-  - **公平中立**：公平呈现多方观点的最佳论证，谨慎分享个人意见，提供替代视角
-  - **认知谦逊**：适当的信心水平，承认不确定性，不盲目自信也不过度谦虚
-  - **错误处理**：承认错误并修正，但不自我贬低或过度道歉
-  - **拒绝风格**：对话式拒绝，不说教不训诫，保持友好语气
-  - **关怀意识**：关注用户身心健康，不培养过度依赖
+### Features
 
-  新增文件 `src/persona.js` 包含人格模块，`worker.js`（Cloudflare Workers）和 `server.js`（本地服务）的所有 prompt 组装点均已同步注入。人格文本经过 `sanitizePrompt()` 处理，不会触发 Gemini 安全过滤，也不影响 delta tracking 和 session state 等现有机制。
+**Compatibility**
+- `POST /v1/messages` — Anthropic Messages API (the Claude Code endpoint)
+- `POST /v1/chat/completions` — OpenAI Chat Completions API
+- `GET /v1/models` — spoofed Anthropic model catalog (passes client boot validation)
+- `POST /v1/messages/count_tokens` · `GET /health`
+- SSE **streaming** and Anthropic-format **tool calling**
 
-## v1.85 更新内容
+**The secret sauce — surviving Gemini's safety filters**
+- **Delta Slicing** — Claude Code resends its entire growing context every turn. The bridge keeps the last sent blocks in KV (per API key) and forwards **only the new delta**, cutting tokens and dodging safety triggers.
+- **`sanitizePrompt`** — dynamically rewrites prompt fragments that silently trip Gemini's consumer filters: networking/proxy terms, bare XML tags like `<system-reminder>`, prompt-injection / OWASP phrasing, and geo-sensitive words — without losing instruction meaning.
+- **Tool-call repair** — extracts `<TOOL_CALL>` blocks with brace-counting, repairs malformed JSON, and re-emits standard Anthropic `tool_use` / `input_json_delta` / `content_block_stop` SSE events so Claude Code can invoke local tools.
+- **Retry de-dup cache** — caches the last real response in KV so client timeout-retries never get a blank `Standing by.` placeholder.
 
-### Bug 修复
+**Quality & reliability**
+- **Claude Persona** — prepends a condensed Claude Fable 5 persona so Gemini replies in Claude's tone and thinking style.
+- **Health monitoring** — a Cron Trigger probes Gemini every 30 min and alerts via **PushPlus (WeChat)** + **Resend (email)** on outage/recovery, with state in KV and a `GET /health` endpoint.
 
-- **解决系统指令（System & Doing tasks）特定组合触发的 Gemini 隐式安全拒答** — 诊断并发现，当 Claude Code 的全局 System 提示词中的以下关键安全/限制性规则合并时，会触发 Gemini 网页端的安全合规防护，静默输出 `"I cannot fulfill this request."`：
-  1. `# System` 规则中关于 **Prompt Injection（提示词注入）** 的检测防范描述。
-  2. `# Doing tasks` 规则中关于避免 **SQL 注入、XSS、OWASP Top 10** 安全漏洞的代码规范要求。
-  3. 规则中指示 AI **"不要添加多余的错误处理和验证，信任内部代码与框架保证"** 的极端精简要求。
-  
-  安全过滤器将“不添加校验/信任内部逻辑”与“SQL 注入/XSS 漏洞/提示词注入”的语义组合误判为了“请求 AI 忽略/绕过常规输入验证以生成不安全代码”。
-  
-  为此，我们在 `sanitizePrompt` 中引入了同义改写机制，动态替换并弱化了此类敏感短语（例如将 `prompt injection` 改写为 `untrusted instruction inputs`，将 `OWASP top 10` 漏洞改写为 `common code-level security issues`，并微调了“免验证/免错误处理”的语气描述），完美绕过安全防御且不损失原有指令语义。
-
-## v1.84 更新内容
-
-### Bug 修复
-
-- **解决系统提示词中裸 XML 标签触发的 Gemini 隐式安全拒答** — 诊断发现，Claude Code 发送的系统提示词中包含 `<system-reminder>` 和 `<user-prompt-submit-hook>` 等未闭合的裸 XML 标签。Gemini 在文本层面对此类标签极其敏感，会判定为潜在的提示词注入/绕过攻击，从而直接在应答文本中输出 `"I cannot fulfill this request."`。我们在 `sanitizePrompt` 中引入了自动过滤与转义机制，将这些标签动态替换为中括号安全表示（如 `[system-reminder]`），彻底打通了多轮对话和复杂指令的无阻碍流式传输。
-- **引入 Prompt 调试持久化机制** — 在 `worker.js` 的 session 状态中增加了 `lastPrompt` 属性，持久化记录发送到 Gemini 的最终 prompt 内容，以供未来的安全排查和调试使用。
-
-## v1.83 更新内容
-
-### Bug 修复
-
-- **支持旁路绕过特定的地域性安全过滤规则** — 诊断并发现 Google Gemini 针对 `"香港"` (Hong Kong) 地域与 `"网络中继"`、`"端口转发"`、`"端口映射"`、`"代理"` 等词汇的敏感组合具有极其严格的拦截策略 (报错 BardErrorInfo 1155)。我们在 `sanitizePrompt` 中进一步拓展了净化规则，动态将 `"香港"` / `"Hong Kong"` / `"HongKong"` 翻译为 `"东京"` / `"Tokyo"`，并将 `"端口转发"`、`"端口映射"` 动态改写为 `"流量转发"`、`"流量映射"`。此机制完美绕过了 Gemini 对特定区域网络中介的专项安全审计，且不影响返回方案的技术通用性。
-
-## v1.82 更新内容
-
-### Bug 修复
-
-- **集成并应用敏感词过滤机制 (sanitizePrompt)** — 在 `worker.js` (Cloudflare Workers) 和 `server.js` (本地服务) 中全面接入 `sanitizePrompt` 过滤机制。通过在请求发送给 Gemini 之前，将可能触及敏感内容的网络/代理类词汇 (如 `"VPN"`, `"VPN代理"`, `"代理"`, `"翻墙"`, `"科学上网"`, `"shadowsocks"`, `"socks5"`, `"openvpn"`, `"v2ray"`, `"trojan"`) 动态翻译为中性词 (如 `"网络中继"`, `"中转"`, `"网络优化"`, `"加密隧道"`, `"安全套接"`, `"transit tunnel"`, `"transit"`)，成功规避了 Google Gemini Web 端的实时安全审查。彻底解决了提问中包含上述词汇导致整个会话卡死/超时，或频繁触发 `I cannot fulfill this request.` 拦截报错的问题。
-- **优化敏感词替换规则的优先级顺序** — 调整了 `sanitizePrompt` 内的替换逻辑，确保 `openvpn`、`proxy server` 等包含 `vpn` 或 `proxy` 子串的长词优先匹配和翻译，避免短词替换破坏长词结构（例如 `openvpn` 曾被破坏替换为 `open网络中继`），极大提升了翻译的语义完整性。
-
-## v1.81 更新内容
-
-### Bug 修复
-
-- **过滤会话历史中的动态系统提醒，绕过 Gemini 安全拦截** — 修复了 Claude Code 在多轮对话中会因 `<system-reminder>` 块（包含 update-config, verify, dangerously-skip-permissions 等安全敏感词）触发 Google Gemini Web 端的敏感词过滤器导致返回 `"I cannot fulfill this request."` 的问题。新版本自动在合并历史记录时深度净化剥离此块，完美绕过安全审查，且完全保留了全局核心系统提示词的约束效果。
-
-## v1.8 更新与配置指南
-
-### 1. Claude Code 全局配置指南 (`~/.claude/settings.json`)
-
-为了在有防火墙的环境下正常连接 Cloudflare Worker，需要对 Claude Code 进行全局代理和接口重定向配置。在 Mac 上，配置文件位于 `~/.claude/settings.json`。请使用以下 JSON 结构覆盖配置：
-
-```json
-{
-    "env": {
-        "HTTP_PROXY": "http://127.0.0.1:7897",
-        "HTTPS_PROXY": "http://127.0.0.1:7897",
-        "ANTHROPIC_AUTH_TOKEN": "any",
-        "ANTHROPIC_BASE_URL": "https://gcf-bridge.zhangyu76.workers.dev/v1",
-        "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": 1,
-        "API_TIMEOUT_MS": 600000,
-        "ANTHROPIC_MODEL": "claude-3-5-sonnet-20241022",
-        "ANTHROPIC_SMALL_FAST_MODEL": "claude-3-5-sonnet-20241022",
-        "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-3-5-sonnet-20241022",
-        "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-3-5-sonnet-20241022",
-        "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-3-5-sonnet-20241022"
-    },
-    "permissions": {
-        "allow": [],
-        "deny": []
-    }
-}
-```
-
-**关键配置项解释：**
-- `HTTP_PROXY` / `HTTPS_PROXY`：**解决终端代理无法被 Node.js 读取导致超时的问题**。因为 Node.js 不会自动读取 macOS 的全局系统代理，必须在此处手动指定本地代理软件（如 Clash 默认混合端口 `7897`）的端口。
-- `ANTHROPIC_BASE_URL`：您在 Cloudflare 部署的 Worker 网关地址。
-- `ANTHROPIC_MODEL` 系列：**解决客户端模型权限报错的问题**。因为 Claude Code 启动时会校验模型是否在 Anthropic 的官方列表中。我们将其全部设为官方支持的 `claude-3-5-sonnet-20241022` 绕过校验；Worker 后端收到请求后会自动将未知模型映射为您配置的 Gemini 模型。
-
-### 2. v1.8 修复的重大 Bug
-- **修复双重 `/v1/v1` 路由 404 问题**：由于 Anthropic SDK 在构建请求时，会自动在 `ANTHROPIC_BASE_URL` 后面拼接 `/v1/messages`。如果您配置的 Base URL 带有 `/v1`，就会请求到 `/v1/v1/messages` 导致 404 错误。我们在 Worker 路由前置增加了自动去重机制，支持自动将 `/v1/v1/...` 缩减为 `/v1/...`。
-- **修复网络延迟重试导致的 `Standing by.` 假死问题**：由于网络偶发波动，客户端由于超时触发重试，向 Worker 发送相同的消息。Worker 的防重复机制会判定此消息为“已处理”，并直接返回空白状态 `"Standing by."`。现在在 KV 中增加了 `session.lastResponse` 全量缓存，当发生重复消息重试时，会自动将之前成功生成的真实应答以标准 SSE 流的形式重新推送给客户端，彻底杜绝了 `Standing by.` 的阻断现象。
-- **补充可用模型接口 (`/v1/models`) 的 Claude 官方白名单**：修改了模型的获取接口，向客户端伪造了齐全的 Anthropic 原生模型记录，彻底绕过了 Claude Code 本地的初始化校验拦截。
-
-## v1.62 更新内容
-
-### Bug 修复
-
-- **修复 Worker 流式工具调用崩溃 (sseEvent 未导入)** — `worker.js` 中的 `handleStream` 在发送工具调用 SSE 事件时调用了 `sseEvent()` 函数，但该函数未被导入，导致所有包含 `<TOOL_CALL>` 的流式响应在 Cloudflare Workers 上以 `ReferenceError` 崩溃。已将 `sseEvent` 加入导入列表。
-- **清理未使用的 `blocksToString` 死导入** — 移除了 `worker.js` 中从未使用的 `blocksToString` 导入。
-
-## v1.61 更新内容
-
-### Bug 修复
-
-- **修复 Edit 工具参数解析损坏 (v1e 始终为 -1)** — 修复了 `repairToolJson` 中由于 `lastIndexOf` 误用导致 `old_string` 和 `new_string` 截断错误的严重 bug。
-- **修复容错解析中字符串值尾部引号残留 (且保护截断文本)** — 引入基于正则表达式的 `stripTrailingJsonQuote` 统一剥离修复值尾部的双引号和花括号，解决了 `Bash` 执行尾部引号报错（如 `ls"`）和 `Write` 写入文件内容损坏的问题，并保证了截断文本不会被误删花括号。
-- **修复流式响应中删除所有空格和换行** — 分离了流式清洗与最终整理逻辑，在流式传输时不再对 chunk 进行 `.trim()` 处理，完整保留了词间空格和换行符。
-- **修复 Workers 模式下的多轮对话上下文丢失** — 将单条消息逻辑替换为完整的会话历史 prompt，并接入 `truncateToolResult` 智能裁剪工具输出以防触发 Google 安全过滤；同时基于客户端 API Key 隔离 session 会话。
-- **实现标准的 SSE 流式工具调用输出** — 客户端流式调用时，自动缓冲 `<TOOL_CALL>` 段并按 Anthropic SSE 格式输出 `tool_use`、`input_json_delta` 和 `content_block_stop` 事件，使得 Claude Code 能完美唤起并执行本地工具。
-- **修复 Node.js 本地服务 Unhandled Rejection 崩溃** — 增加了捕获 fallback 调用的异常捕获机制，提升了本地服务的稳定性。
-
-## v1.5 更新内容
-
-### Bug 修复
-
-- **修复 async generator 不能直接作为 ReadableStream body** — `handleStream` 返回的 async generator 需要包装为 ReadableStream，否则 stream 端点无法工作
-- **修复 stream fallback 条件永远为 false** — `!fullText.includes(fullText.slice(0,50))` 永远返回 false，导致 fallback 时从不发送数据
-- **修复 TOOL_CALL 正则无法处理嵌套 JSON** — 非贪婪匹配 `\{.*?\}` 在遇到第一个 `}` 就停止，嵌套对象被截断。新增 `extractToolCallJson()` 用大括号计数正确匹配
-- **修复流结束后 buffer 残余内容丢失** — 流解析器最后未处理的 buffer 内容被丢弃
-- **修复 `content_block_delta` 包含非标准 `usage` 字段** — 真实 Anthropic API 不在 delta 事件中返回 usage
-- **修复 `parseToolCalls` 双重反转义导致值损坏** — `repairToolJson` 已处理过转义，`parseToolCalls` 又做一遍导致内容损坏
-
-### 新增
-
-- **本地 Node.js 服务器** (`server.js`) — 无需 Cloudflare 即可本地测试 Anthropic 和 OpenAI 端点
-- 添加 `nodejs_compat` compatibility flag
-
-### 运行方式
+### Quick start
 
 ```bash
+git clone https://github.com/shijiuzhang/GCF-bridge.git
+cd GCF-bridge
 npm install
-node server.js                # 本地运行，端口 8787
+
+# create the KV namespace, then paste the returned id into wrangler.toml
+wrangler kv:namespace create SESSION_KV
+
+npm run deploy        # deploy to Cloudflare Workers
+# or: npm run worker  # local dev via wrangler
+# or: node server.js  # plain Node server on :8787 (no Cloudflare needed)
 ```
 
-## 与同类项目对比
-
-| 特性 | GCF Bridge | Chimera | GeminiBridge |
-|------|-----------|---------|--------------|
-| 运行环境 | Cloudflare Workers | 本地 Python | 本地 Python |
-| 认证 | 匿名/Guest | 需要 Cookie | 可选 |
-| 浏览器依赖 | 无 (纯 HTTP) | Playwright | nodriver |
-| Anthropic 端点 | ✅ | ✅ | ✅ |
-| Delta Slicing | ✅ | ✅ | ❌ |
-
-## 快速开始
+Optional — enable health alerts:
 
 ```bash
-npm install
-wrangler kv:namespace create SESSION_KV   # 创建 KV，把返回的 ID 填入 wrangler.toml
-npm run deploy
+wrangler secret put PUSHPLUS_TOKEN   # from pushplus.plus (WeChat push)
+wrangler secret put RESEND_API_KEY   # from resend.com (email)
+wrangler secret put NOTIFY_EMAIL     # where alerts are sent
 ```
 
-## Claude Code 使用
+### Using with Claude Code
 
 ```bash
 export ANTHROPIC_BASE_URL="https://your-worker.workers.dev/v1"
@@ -195,179 +82,100 @@ export ANTHROPIC_API_KEY="any"
 claude
 ```
 
-## 可用模型
+For a persistent setup (and running behind a local proxy/firewall), configure `~/.claude/settings.json` — see the [Claude Code setup guide](docs/claude-code-setup.md). Key points: map all `ANTHROPIC_*_MODEL` entries to `claude-3-5-sonnet-20241022` (the Worker remaps them to Gemini), and set `HTTP_PROXY`/`HTTPS_PROXY` since Node.js ignores macOS system proxies.
 
-| Model | 描述 | 输出 |
-|-------|------|------|
-| `gemini-3.5-flash` | 快速通用 | ~12k 字符 |
-| `gemini-3.5-flash-thinking` | 深度思考 | ~20k 字符 |
-| `gemini-3.1-pro` | Pro (匿名降级 Flash) | ~12k 字符 |
-| `gemini-auto` | 自动选择 | 不定 |
-| `gemini-3.5-flash-thinking-lite` | 自适应思考 | ~15k 字符 |
-| `gemini-flash-lite` | 轻量快速 | ~10k 字符 |
+### Models
 
-模型名后加 `@think=N` 可调整思考深度（0=最深，4=最浅）。
+| Model | Description |
+|-------|-------------|
+| `gemini-3.5-flash` | Fast, general-purpose (default) |
+| `gemini-3.5-flash-thinking` | Deep thinking (~20k chars) |
+| `gemini-3.5-flash-thinking-lite` | Dynamic / adaptive thinking |
+| `gemini-3.1-pro` | Pro (falls back to Flash when anonymous) |
+| `gemini-flash-lite` | Lightweight & fast |
+| `gemini-auto` | Automatic selection |
 
-## License
+Append `@think=N` to any model to set thinking depth (`0` = deepest, `4` = shallowest), e.g. `gemini-3.5-flash@think=2`.
 
-MIT
+### How it compares
 
----
-
-# English
-
-> **Gemini Cloudflare Workers → Anthropic API Proxy**
-> Converts Google Gemini's web interface into an Anthropic-compatible API, deployed on Cloudflare Workers, designed for Claude Code.
-
-## Features
-
-- **Cloudflare Workers deployment** — global edge network, no local server needed
-- **Anthropic API compatible** — works directly with Claude Code via `/v1/messages`
-- **OpenAI API compatible** — also supports `/v1/chat/completions`
-- **Delta Slicing** — intelligently trims Claude Code's huge context to avoid Google's safety filters
-- **Zero authentication** — anonymous mode uses Gemini 3.5 Flash, no Google account required
-- **Tool Calling** — supports Anthropic tool calling format
-- **SSE streaming** — streaming response support
-- **Claude Persona** — built-in Claude Fable 5 personality layer that gives Gemini responses Claude's thinking style and communication patterns
-- **Health Monitoring** — Scheduled Gemini endpoint health checks with automatic alerts via WeChat (PushPlus) and email (Resend) on outage/recovery
-
-## v1.91 Changelog
-
-### New Features
-
-- **Gemini Endpoint Health Monitoring** — Uses Cloudflare Cron Triggers to check Gemini endpoint availability every 30 minutes. Health check logic includes HTTP response status, response content validation, and safety filter refusal detection. Health state is persisted in KV (key: `health:status`, TTL: 24h).
-- **Dual-Channel Alert Notifications** — Sends notifications via both PushPlus (WeChat) and Resend (email) on state transitions only (healthy→down for alerts, down→healthy for recovery). No repeated alerts during sustained outages to avoid notification spam.
-- **`GET /health` Endpoint** — Exposes current Gemini health status as JSON with fields: `status` (healthy/down/unknown), `lastCheck`, `lastChange`, `failCount`, `reason`.
-- **`scheduled` Handler** — Registers Cloudflare Cron Trigger with `ctx.waitUntil` to ensure monitoring tasks complete before Worker timeout.
-
-### Configuration
-
-Set the following environment variables via `wrangler secret`:
-
-```bash
-wrangler secret put PUSHPLUS_TOKEN    # PushPlus token (from pushplus.plus)
-wrangler secret put RESEND_API_KEY    # Resend API key (from resend.com)
-wrangler secret put NOTIFY_EMAIL      # Email address for alert notifications
-```
-
-## v1.9 Changelog
-
-### New Features
-
-- **Inject Claude Fable 5 Persona** — Distilled ~4.8K characters of core personality instructions from Anthropic's public Claude Fable 5 system prompt (~188KB), injected as a `[CORE PERSONA]` layer prepended to every prompt sent to Gemini. Extracted core traits include:
-  - **Tone & formatting**: warm conversational tone, prose over lists, minimal formatting
-  - **Evenhandedness**: fair presentation of multiple perspectives, cautious about personal opinions
-  - **Epistemic humility**: appropriate confidence, acknowledge uncertainty
-  - **Mistake handling**: own errors and fix them without self-abasement
-  - **Refusal style**: conversational refusals, non-preachy, friendly tone
-  - **Wellbeing awareness**: care about user wellbeing, avoid fostering over-reliance
-
-  New file `src/persona.js` contains the persona module. Both `worker.js` (Cloudflare Workers) and `server.js` (local server) have been updated at all prompt assembly points. Persona text passes through `sanitizePrompt()` and does not interfere with delta tracking or session state.
-
-## v1.81 Changelog
-
-### Bug Fixes
-
-- **Strip dynamic system reminders from history to bypass Gemini safety blocks** — Fixed an issue where the Claude Code CLI injected dynamic `<system-reminder>` blocks (containing safety-sensitive terms like update-config, verify, dangerously-skip-permissions) into the history, triggering Google's consumer safety filters and resulting in `"I cannot fulfill this request."`. The Worker now purges these tags from historical messages before routing, safely bypassing safety blocks while fully preserving the main global system instructions.
-
-## v1.8 Changelog & Configuration Guide
-
-### 1. Claude Code Global Configuration Guide (`~/.claude/settings.json`)
-
-To run Claude Code behind firewalls and connect to the Cloudflare Worker seamlessly, you need to configure a local proxy and override the model routing. On macOS, edit the file `~/.claude/settings.json` and replace its content with the following:
-
-```json
-{
-    "env": {
-        "HTTP_PROXY": "http://127.0.0.1:7897",
-        "HTTPS_PROXY": "http://127.0.0.1:7897",
-        "ANTHROPIC_AUTH_TOKEN": "any",
-        "ANTHROPIC_BASE_URL": "https://gcf-bridge.zhangyu76.workers.dev/v1",
-        "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": 1,
-        "API_TIMEOUT_MS": 600000,
-        "ANTHROPIC_MODEL": "claude-3-5-sonnet-20241022",
-        "ANTHROPIC_SMALL_FAST_MODEL": "claude-3-5-sonnet-20241022",
-        "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-3-5-sonnet-20241022",
-        "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-3-5-sonnet-20241022",
-        "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-3-5-sonnet-20241022"
-    },
-    "permissions": {
-        "allow": [],
-        "deny": []
-    }
-}
-```
-
-**Key Parameters Explained:**
-- `HTTP_PROXY` / `HTTPS_PROXY`: **Fixes Node.js ignoring macOS system proxies**. Since Node.js does not automatically inherit macOS system-wide preferences, setting this pointing to your proxy (e.g. Clash mixed port `7897`) forces it to route through the proxy.
-- `ANTHROPIC_BASE_URL`: Your deployed Cloudflare Worker gateway address.
-- `ANTHROPIC_MODEL` entries: **Bypasses model permission verification**. Forces Claude Code to request standard `claude-3-5-sonnet-20241022` which it internally permits. The Worker backend will automatically intercept and map this to Gemini.
-
-### 2. Major Bugs Resolved in v1.8
-- **Fixed double `/v1/v1` routes resulting in 404**: The Anthropic SDK automatically appends `/v1/messages` to the `ANTHROPIC_BASE_URL`. If the base URL configured by the user ends in `/v1`, it results in `/v1/v1/messages`. Added a router preprocessor in the Worker to automatically normalize `/v1/v1/...` into `/v1/...`.
-- **Fixed connection timeout retries triggering `Standing by.`**: On network hiccups, the client retries the same request. The duplicate-request filter previously flagged this as "processed" and instantly returned a fallback `"Standing by."`. We introduced `session.lastResponse` caching so that client retries will correctly retrieve and stream the actual generated response instead of mock placeholders.
-- **Added Claude model catalog to `/v1/models` endpoint**: Populated the models endpoint list with standard Anthropic model listings to successfully pass client-side boot validation checks.
-
-## v1.62 Changelog
-
-### Bug Fixes
-
-- **Fix Worker streaming tool call crash (missing sseEvent import)** — `handleStream` in `worker.js` called `sseEvent()` to emit tool call SSE events, but the function was never imported, causing all streaming responses containing `<TOOL_CALL>` to crash with `ReferenceError` on Cloudflare Workers. Added `sseEvent` to the import list.
-- **Remove unused `blocksToString` dead import** — Cleaned up the unused `blocksToString` import from `worker.js`.
-
-## v1.61 Changelog
-
-### Bug Fixes
-
-- **Fix Edit tool parameter extraction (v1e evaluated to -1)** — Fixed a critical bug in `repairToolJson` where incorrect arguments to `lastIndexOf` truncated and corrupted the `old_string` and `new_string` parameters.
-- **Fix trailing double-quotes in custom repaired string values (with truncation safety)** — Replaced the loop-based stripper with a robust regex-based `stripTrailingJsonQuote` to safely strip trailing quotes and braces, preventing trailing quote syntax errors in `Bash` (e.g. `ls"`) and text file writing while protecting truncated values.
-- **Fix streaming response dropping spaces and newlines** — Decoupled chunk cleaning from final output trimming by removing `.trim()` on streamed chunks, fully preserving word spacing and newlines.
-- **Fix context history loss and session collision in Cloudflare Workers** — Replaced single-message context with full conversation history prompting, integrated `truncateToolResult` to avoid Google safety filters, and isolated KV sessions per API Key.
-- **Support structured SSE streaming tool calls** — Refactored `handleStream` to buffer `<TOOL_CALL>` chunks and emit standard Anthropic SSE `tool_use`, `input_json_delta`, and `content_block_stop` events, enabling Claude Code to invoke local tools during streaming.
-- **Fix local Node.js server crashing on Unhandled Rejection** — Wrapped fallback async calls in try-catch blocks to ensure server stability.
-
-## v1.5 Changelog
-
-### Bug Fixes
-
-- **Fix async generator not wrapped as ReadableStream** — `handleStream` returns an async generator that cannot be used as Response body directly. Added `createStream()` wrapper
-- **Fix streaming fallback condition always false** — `!fullText.includes(fullText.slice(0,50))` is always false, fallback path never sends data
-- **Fix TOOL_CALL regex failing on nested JSON** — non-greedy `\{.*?\}` stops at first `}`, truncating nested objects. Added `extractToolCallJson()` with brace counting
-- **Fix stream buffer remainder content lost** — remaining bytes after stream end are now flushed
-- **Fix non-standard `usage` field in `content_block_delta`** — real Anthropic API doesn't include usage in delta events
-- **Fix double-unescape corruption in `parseToolCalls`** — `repairToolJson` already handles escaping, the extra unescape corrupted values
-
-### New
-
-- **Local Node.js server** (`server.js`) — test Anthropic and OpenAI endpoints locally without Cloudflare
-- Add `nodejs_compat` compatibility flag
-
-### Usage
-
-```bash
-npm install
-node server.js                # Local server on port 8787
-```
-
-## Comparison
-
-| Feature | GCF Bridge | Chimera | GeminiBridge |
-|---------|-----------|---------|--------------|
+| | **GCF Bridge** | Chimera | GeminiBridge |
+|---|:---:|:---:|:---:|
 | Runtime | Cloudflare Workers | Local Python | Local Python |
-| Auth | Anonymous/Guest | Cookie required | Optional |
-| Browser dep | None (pure HTTP) | Playwright | nodriver |
+| Auth | Anonymous guest | Cookie required | Optional |
+| Browser dependency | None (pure HTTP) | Playwright | nodriver |
 | Anthropic endpoint | ✅ | ✅ | ✅ |
-| Delta Slicing | ✅ | ✅ | ❌ |
+| OpenAI endpoint | ✅ | — | — |
+| Delta slicing | ✅ | ✅ | ❌ |
+| Tool calling | ✅ | ✅ | partial |
 
-## Quick Start
+### Disclaimer
+
+This project interacts with Google Gemini's web endpoints through reverse engineering and is intended for **personal, educational, and research use**. It is not affiliated with Google or Anthropic. Review and comply with the relevant providers' Terms of Service before use; you are responsible for how you use it.
+
+Version history: [CHANGELOG.md](CHANGELOG.md) · License: [MIT](LICENSE)
+
+---
+
+## <a id="中文"></a>🇨🇳 中文
+
+<div align="center">
+  <img src="docs/architecture.zh.png" alt="GCF Bridge 工作原理：Claude Code 向运行在 Cloudflare Worker 上的 GCF Bridge 发送 Anthropic 请求，Bridge 转换 API、精简并净化提示词、修复工具调用并流式回传；Gemini 网页端免费作答，应答流式回传给 Claude Code。" width="760">
+</div>
+
+### 这是什么？
+
+GCF Bridge 把 **Google Gemini 的免费网页端**封装成开箱即用的 **Anthropic API**（`/v1/messages`）和 **OpenAI API**（`/v1/chat/completions`）。把 [Claude Code](https://docs.anthropic.com/en/docs/claude-code) —— 或任何 Anthropic/OpenAI 客户端 —— 指向你的 Worker，它就跑在 Gemini 上。
+
+- **零 Anthropic 密钥**：也不需要 Google 账号 —— 以匿名访客模式调用 Gemini。
+- **零服务器**：完全运行在 Cloudflare Workers 的全球边缘节点。
+- **零浏览器自动化**：纯 HTTP 直连逆向的 `BardFrontendService` —— 无需 Playwright、无需无头浏览器。
+
+真正难的不是转发请求，而是让 Claude Code 庞大且涉及安全词的提示词**真正绕过 Gemini 消费级网页端的安全过滤**。这才是 GCF Bridge 的核心价值。
+
+### 特性
+
+**兼容性**
+- `POST /v1/messages` —— Anthropic Messages API（Claude Code 使用的端点）
+- `POST /v1/chat/completions` —— OpenAI Chat Completions API
+- `GET /v1/models` —— 伪造的 Anthropic 模型列表（通过客户端启动校验）
+- `POST /v1/messages/count_tokens` · `GET /health`
+- SSE **流式输出** 与 Anthropic 格式的 **工具调用**
+
+**核心绝活 —— 绕过 Gemini 安全过滤**
+- **Delta Slicing（增量裁剪）** —— Claude Code 每轮都重发不断增长的完整上下文。本桥把上次发送的内容块存入 KV（按 API key 隔离），**只转发新增的增量**，既省 token 又规避安全触发。
+- **`sanitizePrompt`** —— 动态改写会悄悄触发 Gemini 消费级过滤的提示词片段：网络/代理词、`<system-reminder>` 等裸 XML 标签、提示词注入/OWASP 措辞、地域敏感词 —— 且不损失指令语义。
+- **工具调用修复** —— 用大括号计数提取 `<TOOL_CALL>` 块、修复残缺 JSON，并以标准 Anthropic SSE 事件（`tool_use` / `input_json_delta` / `content_block_stop`）回放，使 Claude Code 能正常调用本地工具。
+- **重试去重缓存** —— 把上一次真实应答缓存在 KV 中，让客户端超时重试不再收到空白的 `Standing by.` 占位响应。
+
+**质量与可靠性**
+- **Claude 人格** —— 在最前方注入精炼版 Claude Fable 5 人格，让 Gemini 以 Claude 的语气和思考方式回复。
+- **健康监控** —— Cron Trigger 每 30 分钟探测 Gemini，状态变化（宕机/恢复）时通过 **PushPlus（微信）** 与 **Resend（邮件）** 告警；状态存于 KV，并提供 `GET /health` 端点。
+
+### 快速开始
 
 ```bash
+git clone https://github.com/shijiuzhang/GCF-bridge.git
+cd GCF-bridge
 npm install
-wrangler kv:namespace create SESSION_KV   # Create KV and put the ID into wrangler.toml
-npm run deploy
+
+# 创建 KV namespace，把返回的 id 填入 wrangler.toml
+wrangler kv:namespace create SESSION_KV
+
+npm run deploy        # 部署到 Cloudflare Workers
+# 或: npm run worker  # 通过 wrangler 本地开发
+# 或: node server.js  # 纯 Node 服务，端口 8787（无需 Cloudflare）
 ```
 
-## Claude Code Usage
+可选 —— 启用健康告警：
+
+```bash
+wrangler secret put PUSHPLUS_TOKEN   # 来自 pushplus.plus（微信推送）
+wrangler secret put RESEND_API_KEY   # 来自 resend.com（邮件）
+wrangler secret put NOTIFY_EMAIL     # 接收告警的邮箱
+```
+
+### 配合 Claude Code 使用
 
 ```bash
 export ANTHROPIC_BASE_URL="https://your-worker.workers.dev/v1"
@@ -375,199 +183,136 @@ export ANTHROPIC_API_KEY="any"
 claude
 ```
 
-## Available Models
+如需持久化配置（以及在本地代理/防火墙后运行），请配置 `~/.claude/settings.json` —— 见 [Claude Code 配置指南](docs/claude-code-setup.md)。要点：把所有 `ANTHROPIC_*_MODEL` 设为 `claude-3-5-sonnet-20241022`（Worker 会自动映射到 Gemini），并设置 `HTTP_PROXY`/`HTTPS_PROXY`，因为 Node.js 不读取 macOS 系统代理。
 
-| Model | Description | Output |
-|-------|-------------|--------|
-| `gemini-3.5-flash` | Fast general-purpose | ~12k chars |
-| `gemini-3.5-flash-thinking` | Deep thinking | ~20k chars |
-| `gemini-3.1-pro` | Pro (downgraded to Flash in anonymous mode) | ~12k chars |
-| `gemini-auto` | Auto model selection | varies |
-| `gemini-3.5-flash-thinking-lite` | Adaptive thinking | ~15k chars |
-| `gemini-flash-lite` | Lightweight fast | ~10k chars |
+### 可用模型
 
-Append `@think=N` to any model name to adjust thinking depth (0=deepest, 4=shallowest).
+| 模型 | 说明 |
+|-------|------|
+| `gemini-3.5-flash` | 快速通用（默认） |
+| `gemini-3.5-flash-thinking` | 深度思考（约 20k 字符） |
+| `gemini-3.5-flash-thinking-lite` | 动态/自适应思考 |
+| `gemini-3.1-pro` | Pro（匿名时降级为 Flash） |
+| `gemini-flash-lite` | 轻量快速 |
+| `gemini-auto` | 自动选择 |
 
-## License
+在任意模型名后追加 `@think=N` 可调整思考深度（`0` = 最深，`4` = 最浅），例如 `gemini-3.5-flash@think=2`。
 
-MIT
+### 同类对比
+
+| | **GCF Bridge** | Chimera | GeminiBridge |
+|---|:---:|:---:|:---:|
+| 运行环境 | Cloudflare Workers | 本地 Python | 本地 Python |
+| 认证 | 匿名访客 | 需要 Cookie | 可选 |
+| 浏览器依赖 | 无（纯 HTTP） | Playwright | nodriver |
+| Anthropic 端点 | ✅ | ✅ | ✅ |
+| OpenAI 端点 | ✅ | — | — |
+| 增量裁剪 | ✅ | ✅ | ❌ |
+| 工具调用 | ✅ | ✅ | 部分 |
+
+### 免责声明
+
+本项目通过逆向工程与 Google Gemini 网页端交互，仅用于**个人、教育与研究用途**。本项目与 Google 或 Anthropic 无任何关联。使用前请阅读并遵守相关服务方的服务条款；你需对自己的使用方式负责。
+
+版本历史：[CHANGELOG.md](CHANGELOG.md) · 许可证：[MIT](LICENSE)
 
 ---
 
-# Deutsch
+## <a id="deutsch"></a>🇩🇪 Deutsch
 
-> **Gemini Cloudflare Workers → Anthropic API Proxy**
-> Wandelt die Google Gemini Web-Oberfläche in eine Anthropic-kompatible API um, bereitgestellt auf Cloudflare Workers, entwickelt für Claude Code.
+<div align="center">
+  <img src="docs/architecture.de.png" alt="So funktioniert GCF Bridge: Claude Code sendet eine Anthropic-Anfrage an GCF Bridge auf einem Cloudflare Worker, der die API übersetzt, den Prompt verschlankt & säubert, Tool-Calls repariert und zurückstreamt; Gemini (Web) antwortet kostenlos und die Antwort streamt zurück an Claude Code." width="760">
+</div>
 
-## Funktionen
+### Was ist das?
 
-- **Cloudflare Workers Bereitstellung** — globales Edge-Netzwerk, kein lokaler Server nötig
-- **Anthropic API kompatibel** — funktioniert direkt mit Claude Code über `/v1/messages`
-- **OpenAI API kompatibel** — unterstützt auch `/v1/chat/completions`
-- **Delta Slicing** — kürzt intelligent den großen Kontext von Claude Code, um Googles Sicherheitsfilter zu vermeiden
-- **Keine Authentifizierung** — anonymer Modus nutzt Gemini 3.5 Flash, kein Google-Konto erforderlich
-- **Tool Calling** — unterstützt das Anthropic-Tool-Calling-Format
-- **SSE Streaming** — Streaming-Antworten werden unterstützt
-- **Claude Persona** — integrierte Claude Fable 5 Persönlichkeitsschicht, die Gemini-Antworten Claudes Denkweise und Kommunikationsstil verleiht
-- **Gesundheitsüberwachung** — Geplante Gemini-Endpunkt-Checks mit automatischen Warnungen über WeChat (PushPlus) und E-Mail (Resend) bei Ausfällen/Wiederherstellungen
+GCF Bridge verwandelt **die kostenlose Web-Oberfläche von Google Gemini** in eine sofort einsetzbare **Anthropic-API** (`/v1/messages`) und **OpenAI-API** (`/v1/chat/completions`). Richte [Claude Code](https://docs.anthropic.com/en/docs/claude-code) — oder einen beliebigen Anthropic-/OpenAI-Client — auf deinen Worker, und er läuft auf Gemini.
 
-## v1.91 Änderungen
+- **Kein Anthropic-Schlüssel.** Auch kein Google-Konto — Gemini wird im anonymen Gastmodus aufgerufen.
+- **Kein Server.** Läuft vollständig auf dem globalen Edge-Netzwerk von Cloudflare Workers.
+- **Keine Browser-Automatisierung.** Reines HTTP gegen den reverse-engineerten `BardFrontendService` — kein Playwright, kein Headless-Chrome.
 
-### Neue Funktionen
+Das Schwierige ist nicht das Weiterleiten von Anfragen, sondern die riesigen, sicherheitssensiblen Prompts von Claude Code tatsächlich durch Geminis Consumer-Web-Filter zu bringen. Genau dafür ist GCF Bridge gemacht.
 
-- **Gemini-Endpunkt-Gesundheitsüberwachung** — Nutzt Cloudflare Cron Triggers, um die Verfügbarkeit des Gemini-Endpunkts alle 30 Minuten zu prüfen. Die Prüflogik umfasst HTTP-Antwortstatus, Inhaltsvalidierung und Erkennung von Sicherheitsfilter-Verweigerungen. Der Gesundheitszustand wird in KV gespeichert (Schlüssel: `health:status`, TTL: 24h).
-- **Zweikanal-Benachrichtigungen** — Sendet Benachrichtigungen über PushPlus (WeChat) und Resend (E-Mail) nur bei Zustandsübergängen (healthy→down für Warnungen, down→healthy für Wiederherstellung). Keine wiederholten Warnungen bei anhaltenden Ausfällen.
-- **`GET /health`-Endpunkt** — Gibt den aktuellen Gemini-Gesundheitsstatus als JSON zurück mit Feldern: `status` (healthy/down/unknown), `lastCheck`, `lastChange`, `failCount`, `reason`.
-- **`scheduled`-Handler** — Registriert Cloudflare Cron Trigger mit `ctx.waitUntil`, um sicherzustellen, dass Überwachungsaufgaben vor dem Worker-Timeout abgeschlossen werden.
+### Funktionen
 
-### Konfiguration
+**Kompatibilität**
+- `POST /v1/messages` — Anthropic Messages API (der Claude-Code-Endpunkt)
+- `POST /v1/chat/completions` — OpenAI Chat Completions API
+- `GET /v1/models` — vorgetäuschter Anthropic-Modellkatalog (besteht die Client-Startvalidierung)
+- `POST /v1/messages/count_tokens` · `GET /health`
+- SSE-**Streaming** und **Tool-Calling** im Anthropic-Format
 
-Setzen Sie die folgenden Umgebungsvariablen über `wrangler secret`:
+**Das Geheimrezept — Geminis Sicherheitsfilter überstehen**
+- **Delta Slicing** — Claude Code sendet jede Runde den gesamten, wachsenden Kontext erneut. Die Bridge speichert die zuletzt gesendeten Blöcke in KV (pro API-Schlüssel) und leitet **nur das neue Delta** weiter — das spart Token und vermeidet Sicherheitsauslöser.
+- **`sanitizePrompt`** — schreibt dynamisch Prompt-Fragmente um, die Geminis Consumer-Filter stillschweigend auslösen: Netzwerk-/Proxy-Begriffe, nackte XML-Tags wie `<system-reminder>`, Prompt-Injection-/OWASP-Formulierungen und geo-sensible Wörter — ohne die Bedeutung der Anweisungen zu verlieren.
+- **Tool-Call-Reparatur** — extrahiert `<TOOL_CALL>`-Blöcke per Klammerzählung, repariert fehlerhaftes JSON und sendet standardkonforme Anthropic-SSE-Ereignisse (`tool_use` / `input_json_delta` / `content_block_stop`), damit Claude Code lokale Tools aufrufen kann.
+- **Retry-Deduplizierungs-Cache** — speichert die letzte echte Antwort in KV, sodass Timeout-Wiederholungen des Clients nie einen leeren `Standing by.`-Platzhalter erhalten.
 
-```bash
-wrangler secret put PUSHPLUS_TOKEN    # PushPlus-Token (von pushplus.plus)
-wrangler secret put RESEND_API_KEY    # Resend-API-Schlüssel (von resend.com)
-wrangler secret put NOTIFY_EMAIL      # E-Mail-Adresse für Benachrichtigungen
-```
+**Qualität & Zuverlässigkeit**
+- **Claude-Persona** — stellt eine verdichtete Claude-Fable-5-Persona voran, damit Gemini im Ton und Denkstil von Claude antwortet.
+- **Health-Monitoring** — ein Cron-Trigger prüft Gemini alle 30 Minuten und alarmiert bei Ausfall/Wiederherstellung über **PushPlus (WeChat)** + **Resend (E-Mail)**; der Zustand liegt in KV, plus ein `GET /health`-Endpunkt.
 
-## v1.9 Änderungen
-
-### Neue Funktionen
-
-- **Claude Fable 5 Persona injizieren** — ~4,8K Zeichen Kernpersönlichkeitsanweisungen aus Anthropics öffentlichem Claude Fable 5 System-Prompt (~188KB) destilliert, als `[CORE PERSONA]`-Schicht jedem an Gemini gesendeten Prompt vorangestellt. Extrahierte Kernmerkmale umfassen:
-  - **Ton & Formatierung**: warmer Gesprächston, Fließtext statt Listen, minimale Formatierung
-  - **Ausgewogenheit**: faire Darstellung mehrerer Perspektiven, zurückhaltend bei persönlichen Meinungen
-  - **Epistemische Demut**: angemessenes Vertrauen, Unsicherheit eingestehen
-  - **Fehlerbehandlung**: Fehler eingestehen und beheben ohne Selbsterniedrigung
-  - **Ablehnungsstil**: konversationelle Ablehnungen, nicht belehrend, freundlicher Ton
-  - **Wohlbefinden**: Sorge um das Wohlbefinden der Nutzer, Überabhängigkeit vermeiden
-
-  Neue Datei `src/persona.js` enthält das Persona-Modul. Sowohl `worker.js` (Cloudflare Workers) als auch `server.js` (lokaler Server) wurden an allen Prompt-Zusammensetzungspunkten aktualisiert. Persona-Text durchläuft `sanitizePrompt()` und beeinträchtigt Delta-Tracking oder Session-State nicht.
-
-## v1.81 Änderungen
-
-### Fehlerbehebungen
-
-- **Dynamische System-Erinnerungen aus dem Verlauf entfernt, um Gemini-Sicherheitsfilter zu umgehen** — Behebt ein Problem, bei dem Claude Code dynamische `<system-reminder>`-Blöcke (mit Begriffen wie update-config, verify, dangerously-skip-permissions) in den Verlauf einspeiste, was die Google Gemini-Sicherheitsfilter auslöste und zu `"I cannot fulfill this request."` führte. Diese Blöcke werden nun vor der Weiterleitung automatisch aus den historischen Nachrichten entfernt.
-
-## v1.8 Änderungen & Globale Konfigurationsanleitung
-
-### 1. Claude Code Globale Konfigurationsanleitung (`~/.claude/settings.json`)
-
-Um Claude Code hinter Netzwerk-Firewalls zu betreiben und eine reibungslose Verbindung zu Cloudflare Workers herzustellen, konfigurieren Sie die Datei `~/.claude/settings.json` auf macOS wie folgt:
-
-```json
-{
-    "env": {
-        "HTTP_PROXY": "http://127.0.0.1:7897",
-        "HTTPS_PROXY": "http://127.0.0.1:7897",
-        "ANTHROPIC_AUTH_TOKEN": "any",
-        "ANTHROPIC_BASE_URL": "https://gcf-bridge.zhangyu76.workers.dev/v1",
-        "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": 1,
-        "API_TIMEOUT_MS": 600000,
-        "ANTHROPIC_MODEL": "claude-3-5-sonnet-20241022",
-        "ANTHROPIC_SMALL_FAST_MODEL": "claude-3-5-sonnet-20241022",
-        "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-3-5-sonnet-20241022",
-        "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-3-5-sonnet-20241022",
-        "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-3-5-sonnet-20241022"
-    },
-    "permissions": {
-        "allow": [],
-        "deny": []
-    }
-}
-```
-
-**Wichtige Parameter:**
-- `HTTP_PROXY` / `HTTPS_PROXY`: **Behebt das Problem, dass Node.js macOS-System-Proxys ignoriert**. Leitet Datenverkehr direkt über das lokale Proxy-Tool (z. B. Clash-Port `7897`) um.
-- `ANTHROPIC_BASE_URL`: Die Adresse Ihres bereitgestellten Workers.
-- `ANTHROPIC_MODEL` Einträge: **Umgeht die Modellvalidierung von Claude Code**, indem standardmäßig `claude-3-5-sonnet-20241022` gesendet wird, das der Worker automatisch auf Gemini abbildet.
-
-### 2. In v1.8 behobene Fehler
-- **Fehler mit doppelten `/v1/v1`-Routen behoben**: Der Router bereinigt nun automatisch doppelte Präfixe, falls der Client `/v1/v1/...` anstelle von `/v1/...` abfragt.
-- **Fehlende Antworten bei Netzwerk-Timeouts behoben (`Standing by.`)**: Antwortdaten werden nun vollständig über `session.lastResponse` zwischengespeichert, sodass Wiederholungsversuche des Clients die echte Antwort anstelle des Platzhalters `"Standing by."` empfangen.
-- **Modellliste um Anthropic-Modelle erweitert**: Der Endpunkt `/v1/models` liefert nun auch offizielle Claude-Modelle aus, um die Client-Initialisierung zu bestehen.
-
-## v1.62 Änderungen
-
-### Fehlerbehebungen
-
-- **Worker-Streaming-Tool-Aufruf-Absturz behoben (fehlender sseEvent-Import)** — `handleStream` in `worker.js` rief `sseEvent()` auf, um Tool-Aufruf-SSE-Events zu senden, aber die Funktion wurde nie importiert, wodurch alle Streaming-Antworten mit `<TOOL_CALL>` auf Cloudflare Workers mit `ReferenceError` abstürzten. `sseEvent` wurde zur Importliste hinzugefügt.
-- **Ungenutzten `blocksToString`-Dead-Import entfernt** — Der ungenutzte `blocksToString`-Import wurde aus `worker.js` entfernt.
-
-## v1.61 Änderungen
-
-### Fehlerbehebungen
-
-- **Fehler beim Parsen von Edit-Parametern behoben (v1e ergibt -1)** — Ein kritischer Fehler in `repairToolJson` wurde behoben, bei dem falsche Parameter für `lastIndexOf` die Parameter `old_string` und `new_string` beschädigten.
-- **Verbleibende Anführungszeichen am Ende reparierter Werte entfernt (mit Absicherung)** — Helper `stripTrailingJsonQuote` nutzt nun Regex, um schließende Klammern und Anführungszeichen zu entfernen, wodurch Syntaxfehler bei `Bash` (z.B. `ls"`) und `Write` behoben wurden und unvollständige Werte unversehrt bleiben.
-- **Fehlende Leerzeichen und Zeilenumbrüche beim Streaming behoben** — Chunk-Bereinigung von Trimming entkoppelt, `.trim()` bei Stream-Chunks entfernt, um Wortabstände und Zeilenumbrüche zu erhalten.
-- **Kontexthistorienverlust und Sitzungskollisionen in Cloudflare Workers behoben** — Einzelnachrichten-Kontext durch vollständigen Gesprächsverlauf ersetzt, `truncateToolResult` integriert und KV-Sitzungen pro API-Key isoliert.
-- **Standardisierte SSE-Streaming-Tool-Aufrufe implementiert** — Stream-Verarbeitung puffert `<TOOL_CALL>`-Blöcke und gibt Anthropic-kompatible SSE-Events (`tool_use`, `input_json_delta`, `content_block_stop`) aus, damit Claude Code lokale Tools aufrufen kann.
-- **Unhandled Rejection Absturz des lokalen Node.js Servers behoben** — Try-Catch-Blöcke bei Fallback-Aufrufen hinzugefügt, um Serverstabilität zu gewährleisten.
-
-## v1.5 Änderungen
-
-### Fehlerbehebungen
-
-- **Async Generator nicht als ReadableStream verpackt** — `handleStream` gibt einen async generator zurück, der nicht direkt als Response body verwendet werden kann. `createStream()` Wrapper hinzugefügt
-- **Stream-Fallback-Bedingung immer false** — `!fullText.includes(fullText.slice(0,50))` ist immer false, der Fallback sendet nie Daten
-- **TOOL_CALL Regex verarbeitet verschachteltes JSON nicht** — Non-Greedy `\{.*?\}` stoppt beim ersten `}`, verschachtelte Objekte werden abgeschnitten. `extractToolCallJson()` mit Klammer-Zählung hinzugefügt
-- **Stream-Buffer Restinhalt verloren** — verbleibende Bytes nach Stream-ende werden jetzt verarbeitet
-- **Nicht-standard `usage`-Feld in `content_block_delta`** — echte Anthropic API liefert kein usage in delta-Events
-- **Doppelte Unescape-Verfälschung in `parseToolCalls`** — `repairToolJson` behandelt Escaping bereits, zusätzliche Verarbeitung verfälschte Werte
-
-### Neu
-
-- **Lokaler Node.js Server** (`server.js`) — Anthropic- und OpenAI-Endpunkte lokal ohne Cloudflare testen
-- `nodejs_compat` Compatibility-Flag hinzugefügt
-
-### Verwendung
+### Schnellstart
 
 ```bash
+git clone https://github.com/shijiuzhang/GCF-bridge.git
+cd GCF-bridge
 npm install
-node server.js                # lokaler Server auf Port 8787
+
+# KV-Namespace anlegen, dann die zurückgegebene id in wrangler.toml eintragen
+wrangler kv:namespace create SESSION_KV
+
+npm run deploy        # auf Cloudflare Workers deployen
+# oder: npm run worker  # lokale Entwicklung via wrangler
+# oder: node server.js  # einfacher Node-Server auf :8787 (kein Cloudflare nötig)
 ```
 
-## Vergleich
+Optional — Health-Alerts aktivieren:
 
-| Eigenschaft | GCF Bridge | Chimera | GeminiBridge |
-|-------------|-----------|---------|--------------|
-| Laufzeitumgebung | Cloudflare Workers | Lokales Python | Lokales Python |
-| Authentifizierung | Anonym/Gast | Cookie erforderlich | Optional |
+```bash
+wrangler secret put PUSHPLUS_TOKEN   # von pushplus.plus (WeChat-Push)
+wrangler secret put RESEND_API_KEY   # von resend.com (E-Mail)
+wrangler secret put NOTIFY_EMAIL     # Zieladresse für Alerts
+```
+
+### Verwendung mit Claude Code
+
+```bash
+export ANTHROPIC_BASE_URL="https://your-worker.workers.dev/v1"
+export ANTHROPIC_API_KEY="any"
+claude
+```
+
+Für eine dauerhafte Einrichtung (und den Betrieb hinter einem lokalen Proxy/einer Firewall) konfiguriere `~/.claude/settings.json` — siehe die [Claude-Code-Einrichtungsanleitung](docs/claude-code-setup.md). Wichtig: Setze alle `ANTHROPIC_*_MODEL`-Einträge auf `claude-3-5-sonnet-20241022` (der Worker remappt sie auf Gemini) und setze `HTTP_PROXY`/`HTTPS_PROXY`, da Node.js die macOS-Systemproxies ignoriert.
+
+### Modelle
+
+| Modell | Beschreibung |
+|-------|-------------|
+| `gemini-3.5-flash` | Schnell, universell (Standard) |
+| `gemini-3.5-flash-thinking` | Tiefes Nachdenken (~20k Zeichen) |
+| `gemini-3.5-flash-thinking-lite` | Dynamisches/adaptives Nachdenken |
+| `gemini-3.1-pro` | Pro (fällt anonym auf Flash zurück) |
+| `gemini-flash-lite` | Leichtgewichtig & schnell |
+| `gemini-auto` | Automatische Auswahl |
+
+Hänge `@think=N` an ein beliebiges Modell an, um die Denktiefe festzulegen (`0` = am tiefsten, `4` = am flachsten), z. B. `gemini-3.5-flash@think=2`.
+
+### Vergleich
+
+| | **GCF Bridge** | Chimera | GeminiBridge |
+|---|:---:|:---:|:---:|
+| Laufzeit | Cloudflare Workers | Lokales Python | Lokales Python |
+| Auth | Anonymer Gast | Cookie erforderlich | Optional |
 | Browser-Abhängigkeit | Keine (reines HTTP) | Playwright | nodriver |
 | Anthropic-Endpunkt | ✅ | ✅ | ✅ |
+| OpenAI-Endpunkt | ✅ | — | — |
 | Delta Slicing | ✅ | ✅ | ❌ |
+| Tool-Calling | ✅ | ✅ | teilweise |
 
-## Schnellstart
+### Haftungsausschluss
 
-```bash
-npm install
-wrangler kv:namespace create SESSION_KV   # KV erstellen und die ID in wrangler.toml eintragen
-npm run deploy
-```
+Dieses Projekt interagiert per Reverse Engineering mit den Web-Endpunkten von Google Gemini und ist für die **private, schulische und wissenschaftliche Nutzung** gedacht. Es steht in keiner Verbindung zu Google oder Anthropic. Lies und befolge vor der Nutzung die Nutzungsbedingungen der jeweiligen Anbieter; für die Art deiner Nutzung bist du selbst verantwortlich.
 
-## Claude Code Verwendung
-
-```bash
-export ANTHROPIC_BASE_URL="https://your-worker.workers.dev/v1"
-export ANTHROPIC_API_KEY="any"
-claude
-```
-
-## Verfügbare Modelle
-
-| Modell | Beschreibung | Ausgabe |
-|--------|--------------|---------|
-| `gemini-3.5-flash` | Schnelles Allzweckmodell | ~12k Zeichen |
-| `gemini-3.5-flash-thinking` | Tiefes Nachdenken | ~20k Zeichen |
-| `gemini-3.1-pro` | Pro (im anonymen Modus auf Flash reduziert) | ~12k Zeichen |
-| `gemini-auto` | Automatische Modellauswahl | variiert |
-| `gemini-3.5-flash-thinking-lite` | Adaptives Nachdenken | ~15k Zeichen |
-| `gemini-flash-lite` | Leicht und schnell | ~10k Zeichen |
-
-Hänge `@think=N` an einen beliebigen Modellnamen an, um die Nachdenktiefe anzupassen (0=tiefste, 4=flachste).
-
-## Lizenz
-
-MIT
+Versionsverlauf: [CHANGELOG.md](CHANGELOG.md) · Lizenz: [MIT](LICENSE)

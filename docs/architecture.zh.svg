@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="788" viewBox="0 0 900 788" font-family="'Noto Sans CJK SC','DejaVu Sans',sans-serif">
+  <defs>
+    <marker id="a" markerWidth="11" markerHeight="11" refX="5.5" refY="5.5" orient="auto"><path d="M1,1 L10,5.5 L1,10 L3.5,5.5 Z" fill="#0969da"/></marker>
+    <marker id="ag" markerWidth="11" markerHeight="11" refX="5.5" refY="5.5" orient="auto"><path d="M1,1 L10,5.5 L1,10 L3.5,5.5 Z" fill="#1a7f37"/></marker>
+    <filter id="sh" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#1f2328" flood-opacity="0.12"/></filter>
+  </defs>
+  <rect width="900" height="788" fill="#ffffff"/>
+  <text x="450" y="44" text-anchor="middle" fill="#1f2328" font-size="22" font-weight="700">GCF Bridge 工作原理</text>
+  <text x="450" y="70" text-anchor="middle" fill="#656d76" font-size="15">Claude Code 说 Anthropic 语；Gemini 免费作答。</text>
+  <g filter="url(#sh)"><rect x="250" y="98" width="400" height="72" rx="12" fill="#ddf4ff" stroke="#54aeff" stroke-width="1.5"/></g>
+  <text x="450" y="130" text-anchor="middle" fill="#0a3069" font-size="18" font-weight="700">Claude Code</text>
+  <text x="450" y="153" text-anchor="middle" fill="#1f2328" font-size="13.5">（或任意 Anthropic / OpenAI 客户端）</text>
+  <line x1="420" y1="172" x2="420" y2="212" stroke="#0969da" stroke-width="2.5" marker-end="url(#a)"/>
+  <text x="434" y="197" fill="#0969da" font-size="13">请求</text>
+  <g filter="url(#sh)"><rect x="150" y="224" width="600" height="288" rx="16" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1.5"/></g>
+  <text x="450" y="258" text-anchor="middle" fill="#1f2328" font-size="19" font-weight="700">GCF Bridge</text>
+  <text x="450" y="280" text-anchor="middle" fill="#656d76" font-size="13.5">运行在 Cloudflare Worker 上 · 无服务器、无密钥</text>
+  <g filter="url(#sh)"><rect x="184" y="298" width="532" height="56" rx="10" fill="#ffffff" stroke="#d0d7de" stroke-width="1.3"/></g>
+  <circle cx="214" cy="326" r="13" fill="#dafbe1"/><text x="214" y="331" text-anchor="middle" fill="#1a7f37" font-size="14" font-weight="700">1</text>
+  <text x="240" y="321" fill="#1f2328" font-size="15" font-weight="600">转换 API</text>
+  <text x="240" y="341" fill="#656d76" font-size="13">Anthropic / OpenAI 格式  ⇄  Gemini 网页格式</text>
+  <g filter="url(#sh)"><rect x="184" y="362" width="532" height="56" rx="10" fill="#fff8c5" stroke="#d4a72c" stroke-width="1.6"/></g>
+  <circle cx="214" cy="390" r="13" fill="#fae17d"/><text x="214" y="395" text-anchor="middle" fill="#7d4e00" font-size="14" font-weight="700">2</text>
+  <text x="240" y="385" fill="#1f2328" font-size="15" font-weight="600">精简并净化提示词 <tspan fill="#9a6700" font-style="italic">—— 关键所在</tspan></text>
+  <text x="240" y="405" fill="#656d76" font-size="13">只发送新增上下文 · 改写会触发 Gemini 过滤的词</text>
+  <g filter="url(#sh)"><rect x="184" y="426" width="532" height="56" rx="10" fill="#ffffff" stroke="#d0d7de" stroke-width="1.3"/></g>
+  <circle cx="214" cy="454" r="13" fill="#dafbe1"/><text x="214" y="459" text-anchor="middle" fill="#1a7f37" font-size="14" font-weight="700">3</text>
+  <text x="240" y="449" fill="#1f2328" font-size="15" font-weight="600">流式回传 + 工具调用</text>
+  <text x="240" y="469" fill="#656d76" font-size="13">修复工具调用 JSON · 以 Anthropic 流式事件回放</text>
+  <line x1="395" y1="512" x2="395" y2="566" stroke="#0969da" stroke-width="2.5" marker-end="url(#a)"/>
+  <text x="300" y="544" fill="#0969da" font-size="13">提问</text>
+  <line x1="505" y1="566" x2="505" y2="512" stroke="#1a7f37" stroke-width="2.5" marker-end="url(#ag)"/>
+  <text x="525" y="544" fill="#1a7f37" font-size="13">作答</text>
+  <g filter="url(#sh)"><rect x="250" y="578" width="400" height="72" rx="12" fill="#dafbe1" stroke="#4ac26b" stroke-width="1.5"/></g>
+  <text x="450" y="610" text-anchor="middle" fill="#1a4721" font-size="18" font-weight="700">Gemini（网页）</text>
+  <text x="450" y="633" text-anchor="middle" fill="#1f2328" font-size="13.5">免费 · 匿名 · 无需 Google 账号</text>
+  <path d="M 750 368 H 820 V 134 H 650" fill="none" stroke="#1a7f37" stroke-width="2.5" stroke-dasharray="6 5" marker-end="url(#ag)"/>
+  <text x="838" y="250" fill="#1a7f37" font-size="13" transform="rotate(90 838 250)" text-anchor="middle">应答流式回传给 Claude Code</text>
+  <g filter="url(#sh)"><rect x="150" y="690" width="600" height="64" rx="12" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1.3"/></g>
+  <circle cx="184" cy="722" r="6" fill="#bf8700"/>
+  <text x="202" y="715" fill="#1f2328" font-size="14" font-weight="600">健康监控（可选）</text>
+  <text x="202" y="736" fill="#656d76" font-size="13">每 30 分钟探测 Gemini → 经微信(PushPlus)与邮件(Resend)告警</text>
+</svg>
