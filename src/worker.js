@@ -1,6 +1,7 @@
 import { MODELS, DEFAULT_MODEL, resolveModel, generateId, MAX_TOOL_REDELIVERY, truncateToolResult } from "./config.js";
 import { sendToGemini, extractResponseText, streamGeminiResponse } from "./gemini.js";
 import { getSession, saveSession, contentToBlocks, blockSignatures, computeDelta } from "./delta.js";
+import { flattenContent, flattenPart } from "./content.js";
 import {
   stripSystemReminders,
   buildToolsPrompt,
@@ -121,6 +122,10 @@ async function handleAnthropicMessages(request, env) {
         let raw = typeof b.content === "string" ? b.content : (Array.isArray(b.content) ? b.content.map(c => typeof c === "object" && c.text ? c.text : "").join("\n") : String(b.content || ""));
         raw = truncateToolResult(raw);
         text += `\n[Tool Output Result]:\n${raw}\n`;
+      } else if (b.type === "image" || b.type === "input_image" || b.type === "image_url" || b.type === "document" || b.type === "file" || b.type === "input_file") {
+        const { text: ftext, note } = flattenPart(b);
+        if (ftext) text += stripSystemReminders(ftext) + "\n";
+        if (note) text += note + "\n";
       }
     }
     text = text.trim();
@@ -293,7 +298,7 @@ async function handleChatCompletions(request) {
   const parts = [];
   for (const msg of messages) {
     const role = msg.role || "user";
-    const content = typeof msg.content === "string" ? msg.content : (Array.isArray(msg.content) ? msg.content.filter(c => c.type === "text").map(c => c.text).join(" ") : "");
+    const content = flattenContent(msg.content);
     if (role === "system") parts.push(`[System instruction]: ${content}`);
     else if (role === "assistant") parts.push(`[Assistant]: ${content}`);
     else parts.push(content);

@@ -8,6 +8,10 @@ Most entries are fixes that unblock Claude Code traffic through Gemini's consume
 
 ## <a id="english"></a>🇬🇧 English
 
+### v1.92
+- **Document text extraction for chat clients** — non-text message parts were previously dropped silently (only `type: "text"` survived), so file uploads from chat apps like RikkaHub were hit-or-miss. A new `src/content.js` flattens multimodal content: text passes through, and text-based files (markdown / CSV / JSON / code, base64 `data:` URLs, OpenAI `file` parts, Anthropic `document` blocks) are decoded and inlined. Wired into both the OpenAI (`/v1/chat/completions`) and Anthropic (`/v1/messages`) paths in `worker.js` and `server.js`.
+- **Clear "images not supported" notice** — image attachments can never reach the anonymous Gemini web endpoint, because Google requires signing in for file/image uploads. Instead of failing silently, images now inject a note that instructs the model to tell the user — in their own language — that images aren't supported due to this Google limitation. Unreadable binary files (e.g. PDF) get a similar notice asking the user to paste the text.
+
 ### v1.91
 - **Gemini endpoint health monitoring** — Cloudflare Cron Trigger checks Gemini availability every 30 minutes (HTTP status, response validity, safety-refusal detection). State persisted in KV (`health:status`, TTL 24h).
 - **Dual-channel alerts** — notify via PushPlus (WeChat) and Resend (email) on state transitions only (`healthy→down`, `down→healthy`); no repeated alerts during sustained outages.
@@ -60,6 +64,10 @@ Most entries are fixes that unblock Claude Code traffic through Gemini's consume
 
 ## <a id="中文"></a>🇨🇳 中文
 
+### v1.92
+- **为聊天客户端增加文档文本提取** —— 此前非文本消息块会被静默丢弃（只保留 `type: "text"`），导致 RikkaHub 等聊天应用上传文件时时灵时不灵。新增 `src/content.js` 扁平化多模态内容：文本原样通过，可提取文本的文件（markdown / CSV / JSON / 代码、base64 `data:` URL、OpenAI `file` 块、Anthropic `document` 块）解码后内联。已接入 `worker.js` 与 `server.js` 中 OpenAI（`/v1/chat/completions`）与 Anthropic（`/v1/messages`）两条路径。
+- **明确的“不支持图片”提示** —— 图片永远无法到达匿名 Gemini 网页端，因为 Google 要求登录才能上传文件/图片。现在不再静默失败，而是注入一条提示，指示模型用用户自己的语言告知“因 Google 的限制不支持图片”。无法读取的二进制文件（如 PDF）会得到类似提示，请用户改为粘贴文本。
+
 ### v1.91
 - **Gemini 端点健康监控** —— Cloudflare Cron Trigger 每 30 分钟检测 Gemini 可用性（HTTP 状态、响应有效性、安全拒答识别）。状态持久化于 KV（`health:status`，TTL 24h）。
 - **双通道告警** —— 仅在状态切换（`healthy→down`、`down→healthy`）时通过 PushPlus（微信）与 Resend（邮件）通知；持续异常不重复告警。
@@ -111,6 +119,10 @@ Most entries are fixes that unblock Claude Code traffic through Gemini's consume
 ---
 
 ## <a id="deutsch"></a>🇩🇪 Deutsch
+
+### v1.92
+- **Dokument-Textextraktion für Chat-Clients** — Nicht-Text-Nachrichtenteile wurden zuvor stillschweigend verworfen (nur `type: "text"` blieb erhalten), sodass Datei-Uploads aus Chat-Apps wie RikkaHub unzuverlässig waren. Ein neues `src/content.js` flacht multimodale Inhalte ab: Text wird durchgereicht, und textbasierte Dateien (Markdown / CSV / JSON / Code, base64-`data:`-URLs, OpenAI-`file`-Teile, Anthropic-`document`-Blöcke) werden dekodiert und eingebettet. Eingebunden in die OpenAI- (`/v1/chat/completions`) und Anthropic- (`/v1/messages`) Pfade in `worker.js` und `server.js`.
+- **Klarer Hinweis „Bilder nicht unterstützt“** — Bildanhänge können den anonymen Gemini-Web-Endpunkt nie erreichen, da Google für Datei-/Bild-Uploads eine Anmeldung verlangt. Statt still zu scheitern, fügen Bilder nun einen Hinweis ein, der das Modell anweist, dem Nutzer — in dessen eigener Sprache — mitzuteilen, dass Bilder aufgrund dieser Google-Beschränkung nicht unterstützt werden. Unlesbare Binärdateien (z. B. PDF) erhalten einen ähnlichen Hinweis mit der Bitte, den Text einzufügen.
 
 ### v1.91
 - **Health-Monitoring des Gemini-Endpunkts** — Cloudflare-Cron-Trigger prüft die Verfügbarkeit alle 30 Minuten (HTTP-Status, Antwortgültigkeit, Erkennung von Sicherheitsablehnungen). Zustand in KV gespeichert (`health:status`, TTL 24h).
