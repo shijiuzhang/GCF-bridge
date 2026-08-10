@@ -8,6 +8,9 @@ Most entries are fixes that unblock Claude Code traffic through Gemini's consume
 
 ## <a id="english"></a>🇬🇧 English
 
+### v1.93
+- **Disable Claude Persona Prompt Injection** — Google Gemini's safety filter now blocks prompts attempting to instruct Gemini to impersonate Claude ("Sorry, I cannot pretend to be someone else."). Removed `[CORE PERSONA]` prompt injection from all prompt assembly pipelines in `src/worker.js` and `server.js` to restore Gemini compatibility with Claude Code.
+
 ### v1.92
 - **Document text extraction for chat clients** — non-text message parts were previously dropped silently (only `type: "text"` survived), so file uploads from chat apps like RikkaHub were hit-or-miss. A new `src/content.js` flattens multimodal content: text passes through, and text-based files (markdown / CSV / JSON / code, base64 `data:` URLs, OpenAI `file` parts, Anthropic `document` blocks) are decoded and inlined. Wired into both the OpenAI (`/v1/chat/completions`) and Anthropic (`/v1/messages`) paths in `worker.js` and `server.js`.
 - **Clear "images not supported" notice** — image attachments can never reach the anonymous Gemini web endpoint, because Google requires signing in for file/image uploads. Instead of failing silently, images now inject a note that instructs the model to tell the user — in their own language — that images aren't supported due to this Google limitation. Unreadable binary files (e.g. PDF) get a similar notice asking the user to paste the text.
@@ -64,6 +67,9 @@ Most entries are fixes that unblock Claude Code traffic through Gemini's consume
 
 ## <a id="中文"></a>🇨🇳 中文
 
+### v1.93
+- **禁用 Claude 人格提示词注入** —— 因 Gemini 风控升级，严禁提示词指引 Gemini 伪装成 Claude（会导致模型拦截并回应：“抱歉我不能伪装成其他人”）。已从 `src/worker.js` 和 `server.js` 的所有提示词组装管道中移除 `[CORE PERSONA]` 注入，恢复 Claude Code 与 Gemini 网页端的通信兼容性。
+
 ### v1.92
 - **为聊天客户端增加文档文本提取** —— 此前非文本消息块会被静默丢弃（只保留 `type: "text"`），导致 RikkaHub 等聊天应用上传文件时时灵时不灵。新增 `src/content.js` 扁平化多模态内容：文本原样通过，可提取文本的文件（markdown / CSV / JSON / 代码、base64 `data:` URL、OpenAI `file` 块、Anthropic `document` 块）解码后内联。已接入 `worker.js` 与 `server.js` 中 OpenAI（`/v1/chat/completions`）与 Anthropic（`/v1/messages`）两条路径。
 - **明确的“不支持图片”提示** —— 图片永远无法到达匿名 Gemini 网页端，因为 Google 要求登录才能上传文件/图片。现在不再静默失败，而是注入一条提示，指示模型用用户自己的语言告知“因 Google 的限制不支持图片”。无法读取的二进制文件（如 PDF）会得到类似提示，请用户改为粘贴文本。
@@ -119,6 +125,9 @@ Most entries are fixes that unblock Claude Code traffic through Gemini's consume
 ---
 
 ## <a id="deutsch"></a>🇩🇪 Deutsch
+
+### v1.93
+- **Deaktivierung der Claude-Persona-Injektion** — Geminis Sicherheitsfilter blockiert Prompts, die versuchen, Gemini als Claude auszugeben („Entschuldigung, ich kann mich nicht als jemand anderes ausgeben“). `[CORE PERSONA]`-Injektion aus allen Anfragen entfernt, um die Kompatibilität mit Claude Code wiederherzustellen.
 
 ### v1.92
 - **Dokument-Textextraktion für Chat-Clients** — Nicht-Text-Nachrichtenteile wurden zuvor stillschweigend verworfen (nur `type: "text"` blieb erhalten), sodass Datei-Uploads aus Chat-Apps wie RikkaHub unzuverlässig waren. Ein neues `src/content.js` flacht multimodale Inhalte ab: Text wird durchgereicht, und textbasierte Dateien (Markdown / CSV / JSON / Code, base64-`data:`-URLs, OpenAI-`file`-Teile, Anthropic-`document`-Blöcke) werden dekodiert und eingebettet. Eingebunden in die OpenAI- (`/v1/chat/completions`) und Anthropic- (`/v1/messages`) Pfade in `worker.js` und `server.js`.

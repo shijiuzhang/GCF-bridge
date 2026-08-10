@@ -48,7 +48,7 @@ The hard part isn't proxying requests — it's making Claude Code's massive, saf
 - **Retry de-dup cache** — caches the last real response in KV so client timeout-retries never get a blank `Standing by.` placeholder.
 
 **Quality & reliability**
-- **Claude Persona** — prepends a condensed Claude Fable 5 persona so Gemini replies in Claude's tone and thinking style.
+- **Claude Persona (Disabled)** — Previously prepended a condensed Claude Fable 5 persona. Disabled because Gemini's safety filter now blocks model impersonation prompts ("Sorry, I cannot pretend to be someone else.").
 - **Health monitoring** — a Cron Trigger probes Gemini every 30 min and alerts via **PushPlus (WeChat)** + **Resend (email)** on outage/recovery, with state in KV and a `GET /health` endpoint.
 
 ### Quick start
@@ -149,7 +149,7 @@ GCF Bridge 把 **Google Gemini 的免费网页端**封装成开箱即用的 **An
 - **重试去重缓存** —— 把上一次真实应答缓存在 KV 中，让客户端超时重试不再收到空白的 `Standing by.` 占位响应。
 
 **质量与可靠性**
-- **Claude 人格** —— 在最前方注入精炼版 Claude Fable 5 人格，让 Gemini 以 Claude 的语气和思考方式回复。
+- **Claude 人格（已禁用）** —— 此前注入精炼版 Claude Fable 5 人格，现因 Gemini 风控升级禁止模型伪装（回复“抱歉我不能伪装成其他人”）而已默认禁用。
 - **健康监控** —— Cron Trigger 每 30 分钟探测 Gemini，状态变化（宕机/恢复）时通过 **PushPlus（微信）** 与 **Resend（邮件）** 告警；状态存于 KV，并提供 `GET /health` 端点。
 
 ### 快速开始
@@ -250,7 +250,7 @@ Das Schwierige ist nicht das Weiterleiten von Anfragen, sondern die riesigen, si
 - **Retry-Deduplizierungs-Cache** — speichert die letzte echte Antwort in KV, sodass Timeout-Wiederholungen des Clients nie einen leeren `Standing by.`-Platzhalter erhalten.
 
 **Qualität & Zuverlässigkeit**
-- **Claude-Persona** — stellt eine verdichtete Claude-Fable-5-Persona voran, damit Gemini im Ton und Denkstil von Claude antwortet.
+- **Claude-Persona (Deaktiviert)** — Zuvor wurde eine Claude-Persona vorangestellt. Deaktiviert, da Geminis Sicherheitsfilter Modellanmaßung blockiert.
 - **Health-Monitoring** — ein Cron-Trigger prüft Gemini alle 30 Minuten und alarmiert bei Ausfall/Wiederherstellung über **PushPlus (WeChat)** + **Resend (E-Mail)**; der Zustand liegt in KV, plus ein `GET /health`-Endpunkt.
 
 ### Schnellstart

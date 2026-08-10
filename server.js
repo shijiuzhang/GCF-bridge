@@ -46,7 +46,9 @@ function sendMessagesHandler(res, body) {
     else if (role === "assistant") parts.push(`[Assistant]: ${content}`);
     else parts.push(content);
   }
-  const prompt = sanitizePrompt(`[CORE PERSONA]\n${buildPersona()}\n\n${parts.join("\n\n")}`);
+  const persona = buildPersona();
+  const personaHeader = persona ? `[CORE PERSONA]\n${persona}\n\n` : "";
+  const prompt = sanitizePrompt(`${personaHeader}${parts.join("\n\n")}`);
 
   sendToGemini(prompt, modelInfo.mode, modelInfo.think)
     .then(raw => {
@@ -93,7 +95,8 @@ async function handleStreamHTTP(res, modelInfo, messages, reqData) {
   }
   const historyText = parts.join("\n\n");
   const persona = buildPersona();
-  const prompt = sanitizePrompt(`[CORE PERSONA]\n${persona}\n\n[SYSTEM INSTRUCTIONS]\n${sysPrompt}\n\n${toolsPrompt}\n[CONVERSATION HISTORY]\n${historyText}`.replace(/\n{3,}/g, "\n\n").trim());
+  const personaHeader = persona ? `[CORE PERSONA]\n${persona}\n\n` : "";
+  const prompt = sanitizePrompt(`${personaHeader}[SYSTEM INSTRUCTIONS]\n${sysPrompt}\n\n${toolsPrompt}\n[CONVERSATION HISTORY]\n${historyText}`.replace(/\n{3,}/g, "\n\n").trim());
 
   const msgId = `msg_${generateId("")}`;
 
@@ -181,7 +184,9 @@ function handleChatCompletions(res, body) {
     else if (role === "assistant") parts.push(`[Assistant]: ${content}`);
     else parts.push(content);
   }
-  const prompt = sanitizePrompt(`[CORE PERSONA]\n${buildPersona()}\n\n${parts.join("\n\n")}`);
+  const persona = buildPersona();
+  const personaHeader = persona ? `[CORE PERSONA]\n${persona}\n\n` : "";
+  const prompt = sanitizePrompt(`${personaHeader}${parts.join("\n\n")}`);
 
   if (reqData.stream) {
     res.writeHead(200, {

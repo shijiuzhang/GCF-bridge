@@ -135,7 +135,8 @@ async function handleAnthropicMessages(request, env) {
   }
   const historyText = parts.join("\n\n");
   const persona = buildPersona();
-  const prompt = sanitizePrompt(`[CORE PERSONA]\n${persona}\n\n[SYSTEM INSTRUCTIONS]\n${sysPrompt}\n\n${toolsPrompt}\n[CONVERSATION HISTORY]\n${historyText}`.replace(/\n{3,}/g, "\n\n").trim());
+  const personaHeader = persona ? `[CORE PERSONA]\n${persona}\n\n` : "";
+  const prompt = sanitizePrompt(`${personaHeader}[SYSTEM INSTRUCTIONS]\n${sysPrompt}\n\n${toolsPrompt}\n[CONVERSATION HISTORY]\n${historyText}`.replace(/\n{3,}/g, "\n\n").trim());
   session.lastPrompt = prompt;
 
   if (stream) {
@@ -303,7 +304,9 @@ async function handleChatCompletions(request) {
     else if (role === "assistant") parts.push(`[Assistant]: ${content}`);
     else parts.push(content);
   }
-  const prompt = sanitizePrompt(`[CORE PERSONA]\n${buildPersona()}\n\n${parts.join("\n\n")}`);
+  const persona = buildPersona();
+  const personaHeader = persona ? `[CORE PERSONA]\n${persona}\n\n` : "";
+  const prompt = sanitizePrompt(`${personaHeader}${parts.join("\n\n")}`);
 
   const cid = `chatcmpl-${generateId("")}`;
 
