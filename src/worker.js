@@ -42,27 +42,28 @@ function sseResp(stream) {
 }
 
 async function handleAnthropicMessages(request, env) {
-  const body = await request.json();
-  const messages = body.messages || [];
-  if (!messages.length) return jsonResp({ error: { type: "invalid_request_error", message: "messages is required" } }, 400);
+  try {
+    const body = await request.json();
+    const messages = body.messages || [];
+    if (!messages.length) return jsonResp({ error: { type: "invalid_request_error", message: "messages is required" } }, 400);
 
-  const modelInfo = resolveModel(body.model);
-  const apiKey = request.headers.get("x-api-key") || request.headers.get("authorization") || "";
-  const sessionId = (apiKey + "_" + (body.model || "default")).replace(/[^a-zA-Z0-9_]/g, "").slice(0, 100) || "default";
-  const msgId = `msg_${generateId("")}`;
-  const stream = body.stream || false;
-  const reqDump = JSON.stringify(body);
+    const modelInfo = resolveModel(body.model);
+    const apiKey = request.headers.get("x-api-key") || request.headers.get("authorization") || "";
+    const sessionId = (apiKey + "_" + (body.model || "default")).replace(/[^a-zA-Z0-9_]/g, "").slice(0, 100) || "default";
+    const msgId = `msg_${generateId("")}`;
+    const stream = body.stream || false;
+    const reqDump = JSON.stringify(body);
 
-  if (reqDump.includes("Generate a concise, sentence-case title")) {
-    return jsonResp({
-      id: "msg_title_gen", type: "message", role: "assistant",
-      content: [{ type: "text", text: '{"title": "GCF Bridge Session"}'}],
-      model: modelInfo.name, stop_reason: "end_turn", stop_sequence: null,
-      usage: { input_tokens: 10, output_tokens: 10 },
-    });
-  }
+    if (reqDump.includes("Generate a concise, sentence-case title")) {
+      return jsonResp({
+        id: "msg_title_gen", type: "message", role: "assistant",
+        content: [{ type: "text", text: '{"title": "GCF Bridge Session"}'}],
+        model: modelInfo.name, stop_reason: "end_turn", stop_sequence: null,
+        usage: { input_tokens: 10, output_tokens: 10 },
+      });
+    }
 
-  const session = await getSession(env, sessionId);
+    const session = await getSession(env, sessionId);
 
   // If a new conversation starts (only 1 message), reset session state to avoid duplicate signature matches
   if (messages.length === 1) {
@@ -143,27 +144,27 @@ async function handleAnthropicMessages(request, env) {
     return sseResp(createStream(modelInfo, prompt, msgId, session, sessionId, env));
   }
 
-  try {
-    const raw = await sendToGemini(prompt, modelInfo.mode, modelInfo.think, { env });
-    const text = extractResponseText(raw);
-    const result = buildAnthropicResponse(text, modelInfo.name, msgId);
+  const raw = await sendToGemini(prompt, modelInfo.mode, modelInfo.think, { env });
+  const text = extractResponseText(raw);
+  const result = buildAnthropicResponse(text, modelInfo.name, msgId);
 
-    if (result.stop_reason === "tool_use") {
-      session.pendingToolIds = result.content.filter(b => b.type === "tool_use").map(b => b.id);
-      session.lastToolResponse = result;
-      session.toolRedeliveryCount = 0;
-    } else {
-      session.pendingToolIds = [];
-      session.lastToolResponse = null;
-    }
-    session.lastResponse = result;
-    session.messageCount++;
-    await saveSession(env, sessionId, session);
-
-    return jsonResp(result);
-  } catch (e) {
-    return jsonResp({ error: { type: "server_error", message: String(e) } }, 500);
+  if (result.stop_reason === "tool_use") {
+    session.pendingToolIds = result.content.filter(b => b.type === "tool_use").map(b => b.id);
+    session.lastToolResponse = result;
+    session.toolRedeliveryCount = 0;
+  } else {
+    session.pendingToolIds = [];
+    session.lastToolResponse = null;
   }
+  session.lastResponse = result;
+  session.messageCount++;
+  await saveSession(env, sessionId, session);
+
+  return jsonResp(result);
+} catch (e) {
+  console.error("[Anthropic] Error:", e);
+  return jsonResp({ error: { type: "server_error", message: String(e) } }, 500);
+}
 }
 
 function createStream(modelInfo, prompt, msgId, session, sessionId, env) {

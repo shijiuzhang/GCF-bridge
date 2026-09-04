@@ -1,13 +1,32 @@
 import { SESSION_TTL } from "./config.js";
 
+const inMemorySessions = new Map();
+
 async function getSession(env, sessionId) {
-  const raw = await env.SESSION_KV.get(`session:${sessionId}`);
-  if (raw) return JSON.parse(raw);
+  if (env && env.SESSION_KV) {
+    try {
+      const raw = await env.SESSION_KV.get(`session:${sessionId}`);
+      if (raw) return JSON.parse(raw);
+    } catch (e) {
+      console.warn("[Session] KV get failed, falling back to in-memory:", e);
+    }
+  }
+  if (inMemorySessions.has(sessionId)) {
+    return inMemorySessions.get(sessionId);
+  }
   return { lastBlocks: [], pendingToolIds: [], toolRedeliveryCount: 0, messageCount: 0 };
 }
 
 async function saveSession(env, sessionId, session) {
-  await env.SESSION_KV.put(`session:${sessionId}`, JSON.stringify(session), { expirationTtl: SESSION_TTL });
+  if (env && env.SESSION_KV) {
+    try {
+      await env.SESSION_KV.put(`session:${sessionId}`, JSON.stringify(session), { expirationTtl: SESSION_TTL });
+      return;
+    } catch (e) {
+      console.warn("[Session] KV put failed, falling back to in-memory:", e);
+    }
+  }
+  inMemorySessions.set(sessionId, session);
 }
 
 function contentToBlocks(content) {
