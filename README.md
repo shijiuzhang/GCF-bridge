@@ -44,15 +44,14 @@ The hard part isn't proxying requests — it's making Claude Code's massive, saf
 **The secret sauce — surviving Gemini's safety filters**
 - **Delta Slicing** — Claude Code resends its entire growing context every turn. The bridge keeps the last sent blocks in KV (per API key) and forwards **only the new delta**, cutting tokens and dodging safety triggers.
 - **`sanitizePrompt`** — dynamically rewrites prompt fragments that silently trip Gemini's consumer filters: networking/proxy terms, bare XML tags like `<system-reminder>`, prompt-injection / OWASP phrasing, and geo-sensitive words — without losing instruction meaning.
-- **Tool-call repair** — extracts `<TOOL_CALL>` blocks with brace-counting, repairs malformed JSON, and re-emits standard Anthropic `tool_use` / `input_json_delta` / `content_block_stop` SSE events so Claude Code can invoke local tools.
 - **Retry de-dup cache** — caches the last real response in KV so client timeout-retries never get a blank `Standing by.` placeholder.
 
 **Quality & reliability**
+- **BL auto-update & self-healing** — dynamically fetches the latest Gemini frontend build label from `gemini.google.com` on HTTP 405 errors and refreshes KV cache proactively during 30-min health checks, eliminating downtime when Google rotates versions.
 - **Claude Persona (Disabled)** — Previously prepended a condensed Claude Fable 5 persona. Disabled because Gemini's safety filter now blocks model impersonation prompts ("Sorry, I cannot pretend to be someone else.").
 - **Health monitoring** — a Cron Trigger probes Gemini every 30 min and alerts via **PushPlus (WeChat)** + **Resend (email)** on outage/recovery, with state in KV and a `GET /health` endpoint.
 
 ### Quick start
-
 ```bash
 git clone https://github.com/shijiuzhang/GCF-bridge.git
 cd GCF-bridge
@@ -75,7 +74,6 @@ wrangler secret put NOTIFY_EMAIL     # where alerts are sent
 ```
 
 ### Using with Claude Code
-
 ```bash
 export ANTHROPIC_BASE_URL="https://your-worker.workers.dev/v1"
 export ANTHROPIC_API_KEY="any"
@@ -88,14 +86,18 @@ For a persistent setup (and running behind a local proxy/firewall), configure `~
 
 | Model | Description |
 |-------|-------------|
-| `gemini-3.5-flash` | Fast, general-purpose (default) |
+| `gemini-3.8-flash` | Latest all-around model (default) |
+| `gemini-3.8-flash-thinking` | Deep thinking (~20k chars) |
+| `gemini-3.7-flash` | All-around model |
+| `gemini-3.6-flash` | Fast, general-purpose |
+| `gemini-3.5-flash` | Legacy general-purpose |
 | `gemini-3.5-flash-thinking` | Deep thinking (~20k chars) |
 | `gemini-3.5-flash-thinking-lite` | Dynamic / adaptive thinking |
 | `gemini-3.1-pro` | Pro (falls back to Flash when anonymous) |
 | `gemini-flash-lite` | Lightweight & fast |
 | `gemini-auto` | Automatic selection |
 
-Append `@think=N` to any model to set thinking depth (`0` = deepest, `4` = shallowest), e.g. `gemini-3.5-flash@think=2`.
+Append `@think=N` to any model to set thinking depth (`0` = deepest, `4` = shallowest), e.g. `gemini-3.8-flash@think=2`.
 
 ### How it compares
 
@@ -149,6 +151,7 @@ GCF Bridge 把 **Google Gemini 的免费网页端**封装成开箱即用的 **An
 - **重试去重缓存** —— 把上一次真实应答缓存在 KV 中，让客户端超时重试不再收到空白的 `Standing by.` 占位响应。
 
 **质量与可靠性**
+- **BL 自动更新与自愈机制** —— 遭遇 HTTP 405 时自动从 `gemini.google.com` 抓取最新构建标识（BL）并自动重试，并在 30 分钟 Cron 探活任务中主动刷新 KV 缓存，彻底解决谷歌前端版本轮换导致的连接中断。
 - **Claude 人格（已禁用）** —— 此前注入精炼版 Claude Fable 5 人格，现因 Gemini 风控升级禁止模型伪装（回复“抱歉我不能伪装成其他人”）而已默认禁用。
 - **健康监控** —— Cron Trigger 每 30 分钟探测 Gemini，状态变化（宕机/恢复）时通过 **PushPlus（微信）** 与 **Resend（邮件）** 告警；状态存于 KV，并提供 `GET /health` 端点。
 
@@ -189,14 +192,18 @@ claude
 
 | 模型 | 说明 |
 |-------|------|
-| `gemini-3.5-flash` | 快速通用（默认） |
+| `gemini-3.8-flash` | 最新全能模型（默认） |
+| `gemini-3.8-flash-thinking` | 深度思考（约 20k 字符） |
+| `gemini-3.7-flash` | 全能模型 |
+| `gemini-3.6-flash` | 快速通用模型 |
+| `gemini-3.5-flash` | 早期通用模型 |
 | `gemini-3.5-flash-thinking` | 深度思考（约 20k 字符） |
 | `gemini-3.5-flash-thinking-lite` | 动态/自适应思考 |
 | `gemini-3.1-pro` | Pro（匿名时降级为 Flash） |
 | `gemini-flash-lite` | 轻量快速 |
 | `gemini-auto` | 自动选择 |
 
-在任意模型名后追加 `@think=N` 可调整思考深度（`0` = 最深，`4` = 最浅），例如 `gemini-3.5-flash@think=2`。
+在任意模型名后追加 `@think=N` 可调整思考深度（`0` = 最深，`4` = 最浅），例如 `gemini-3.8-flash@think=2`。
 
 ### 同类对比
 
@@ -250,6 +257,7 @@ Das Schwierige ist nicht das Weiterleiten von Anfragen, sondern die riesigen, si
 - **Retry-Deduplizierungs-Cache** — speichert die letzte echte Antwort in KV, sodass Timeout-Wiederholungen des Clients nie einen leeren `Standing by.`-Platzhalter erhalten.
 
 **Qualität & Zuverlässigkeit**
+- **BL Auto-Update & Self-Healing** — Ruft bei HTTP-405-Fehlern automatisch das neueste Gemini-Frontend-Build-Label von `gemini.google.com` ab und aktualisiert den KV-Cache im 30-minütigen Health-Check, um Ausfälle bei Google-Frontend-Updates zu verhindern.
 - **Claude-Persona (Deaktiviert)** — Zuvor wurde eine Claude-Persona vorangestellt. Deaktiviert, da Geminis Sicherheitsfilter Modellanmaßung blockiert.
 - **Health-Monitoring** — ein Cron-Trigger prüft Gemini alle 30 Minuten und alarmiert bei Ausfall/Wiederherstellung über **PushPlus (WeChat)** + **Resend (E-Mail)**; der Zustand liegt in KV, plus ein `GET /health`-Endpunkt.
 
@@ -290,14 +298,18 @@ Für eine dauerhafte Einrichtung (und den Betrieb hinter einem lokalen Proxy/ein
 
 | Modell | Beschreibung |
 |-------|-------------|
-| `gemini-3.5-flash` | Schnell, universell (Standard) |
+| `gemini-3.8-flash` | Neuestes Allround-Modell (Standard) |
+| `gemini-3.8-flash-thinking` | Tiefes Nachdenken (~20k Zeichen) |
+| `gemini-3.7-flash` | Allround-Modell |
+| `gemini-3.6-flash` | Schnell, universell |
+| `gemini-3.5-flash` | Älteres Allround-Modell |
 | `gemini-3.5-flash-thinking` | Tiefes Nachdenken (~20k Zeichen) |
 | `gemini-3.5-flash-thinking-lite` | Dynamisches/adaptives Nachdenken |
 | `gemini-3.1-pro` | Pro (fällt anonym auf Flash zurück) |
 | `gemini-flash-lite` | Leichtgewichtig & schnell |
 | `gemini-auto` | Automatische Auswahl |
 
-Hänge `@think=N` an ein beliebiges Modell an, um die Denktiefe festzulegen (`0` = am tiefsten, `4` = am flachsten), z. B. `gemini-3.5-flash@think=2`.
+Hänge `@think=N` an ein beliebiges Modell an, um die Denktiefe festzulegen (`0` = am tiefsten, `4` = am flachsten), z. B. `gemini-3.8-flash@think=2`.
 
 ### Vergleich
 

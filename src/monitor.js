@@ -1,11 +1,11 @@
-import { sendToGemini } from "./gemini.js";
+import { sendToGemini, refreshBL } from "./gemini.js";
 
 const HEALTH_KEY = "health:status";
 const HEALTH_TTL = 86400; // 24 hours
 
-async function checkGeminiHealth() {
+async function checkGeminiHealth(env) {
   try {
-    const raw = await sendToGemini("hi", 1, 4);
+    const raw = await sendToGemini("hi", 1, 4, { env });
     if (!raw || raw.length < 50) {
       return { ok: false, reason: "Empty or too short response" };
     }
@@ -77,8 +77,15 @@ async function notify(env, title, content) {
 }
 
 async function handleMonitor(env) {
+  // Proactively check and update BL if rotated by Google
+  try {
+    await refreshBL(env);
+  } catch (e) {
+    console.error("[Monitor] Proactive BL refresh failed:", e);
+  }
+
   const prev = await getHealthState(env);
-  const result = await checkGeminiHealth();
+  const result = await checkGeminiHealth(env);
   const now = Date.now();
 
   console.log(`[Monitor] check result: ok=${result.ok} reason=${result.reason} prevStatus=${prev.status}`);

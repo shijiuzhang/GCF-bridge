@@ -144,7 +144,7 @@ async function handleAnthropicMessages(request, env) {
   }
 
   try {
-    const raw = await sendToGemini(prompt, modelInfo.mode, modelInfo.think);
+    const raw = await sendToGemini(prompt, modelInfo.mode, modelInfo.think, { env });
     const text = extractResponseText(raw);
     const result = buildAnthropicResponse(text, modelInfo.name, msgId);
 
@@ -213,7 +213,7 @@ async function* handleStream(modelInfo, prompt, msgId, session, sessionId, env) 
   let isStreamingToClient = true;
 
   try {
-    for await (const chunk of streamGeminiResponse(prompt, modelInfo.mode, modelInfo.think)) {
+    for await (const chunk of streamGeminiResponse(prompt, modelInfo.mode, modelInfo.think, { env })) {
       fullText += chunk;
       if (isStreamingToClient) {
         const toolCallIdx = fullText.indexOf("<TOOL_CALL>");
@@ -231,7 +231,7 @@ async function* handleStream(modelInfo, prompt, msgId, session, sessionId, env) 
     }
   } catch {
     try {
-      const raw = await sendToGemini(prompt, modelInfo.mode, modelInfo.think);
+      const raw = await sendToGemini(prompt, modelInfo.mode, modelInfo.think, { env });
       fullText = extractResponseText(raw);
       if (isStreamingToClient && fullText) {
         const { text: clean } = parseToolCalls(fullText);
@@ -290,7 +290,7 @@ async function* handleStream(modelInfo, prompt, msgId, session, sessionId, env) 
   await saveSession(env, sessionId, session);
 }
 
-async function handleChatCompletions(request) {
+async function handleChatCompletions(request, env) {
   const body = await request.json();
   const modelInfo = resolveModel(body.model);
   const messages = body.messages || [];
@@ -315,7 +315,7 @@ async function handleChatCompletions(request) {
     const stream = new ReadableStream({
       async start(controller) {
         try {
-          for await (const chunk of streamGeminiResponse(prompt, modelInfo.mode, modelInfo.think)) {
+          for await (const chunk of streamGeminiResponse(prompt, modelInfo.mode, modelInfo.think, { env })) {
             const data = {
               id: cid, object: "chat.completion.chunk", created: Math.floor(Date.now() / 1000),
               model: modelInfo.name, choices: [{ index: 0, delta: { content: chunk }, finish_reason: null }],
@@ -323,7 +323,7 @@ async function handleChatCompletions(request) {
             controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
           }
         } catch {
-          const raw = await sendToGemini(prompt, modelInfo.mode, modelInfo.think);
+          const raw = await sendToGemini(prompt, modelInfo.mode, modelInfo.think, { env });
           const text = extractResponseText(raw);
           if (text) {
             const data = {
@@ -346,7 +346,7 @@ async function handleChatCompletions(request) {
   }
 
   try {
-    const raw = await sendToGemini(prompt, modelInfo.mode, modelInfo.think);
+    const raw = await sendToGemini(prompt, modelInfo.mode, modelInfo.think, { env });
     const text = extractResponseText(raw);
     return jsonResp({
       id: cid, object: "chat.completion", created: Math.floor(Date.now() / 1000),
@@ -416,7 +416,7 @@ export default {
     }
 
     if (path === "/" && request.method === "GET") {
-      return jsonResp({ status: "ok", version: "1.91.0", models: Object.keys(MODELS) });
+      return jsonResp({ status: "ok", version: "1.94.0", models: Object.keys(MODELS) });
     }
 
     if (path === "/health" && request.method === "GET") {
@@ -430,7 +430,7 @@ export default {
 
     if (path === "/v1/messages/count_tokens" && request.method === "POST") return jsonResp({ input_tokens: 100 });
 
-    if (path === "/v1/chat/completions" && request.method === "POST") return handleChatCompletions(request);
+    if (path === "/v1/chat/completions" && request.method === "POST") return handleChatCompletions(request, env);
 
     return jsonResp({ error: "not found" }, 404);
   },

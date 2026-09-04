@@ -250,7 +250,7 @@ const server = http.createServer(async (req, res) => {
   }
 
   if (req.method === "GET" && path === "/") {
-    return jsonResp(res, { status: "ok", version: "1.0.0", models: Object.keys(MODELS) });
+    return jsonResp(res, { status: "ok", version: "1.94.0", models: Object.keys(MODELS) });
   }
   if (req.method === "GET" && (path === "/v1/models" || path === "/v1beta/models")) {
     const anthropicModels = [

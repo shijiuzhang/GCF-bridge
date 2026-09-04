@@ -8,6 +8,11 @@ Most entries are fixes that unblock Claude Code traffic through Gemini's consume
 
 ## <a id="english"></a>🇬🇧 English
 
+### v1.94
+- **Self-Healing Build Label (BL) Auto-Update** — Google Gemini web regularly rotates the frontend build label (BL) parameter (`boq_assistant-bard-web-server_*`). Mismatched BLs trigger HTTP 405 Method Not Allowed errors. Added dynamic BL fetching from `https://gemini.google.com/app`, KV persistence (`gemini:bl`), automated self-healing retry on 405/404, and proactive checks in the 30-min Cron Trigger. Updated baseline BL to `boq_assistant-bard-web-server_20260831.15_p2`.
+- **Add Gemini 3.8, 3.7 & 3.6 Models** — Added support for `gemini-3.8-flash` (new default model), `gemini-3.8-flash-thinking`, `gemini-3.7-flash`, and `gemini-3.6-flash`. Updated model alias resolution with resilient fallback.
+- **Clean Anonymous RPC Endpoint** — Stripped `/u/0` prefix from default RPC URL to prevent session conflicts during anonymous guest access.
+
 ### v1.93
 - **Disable Claude Persona Prompt Injection** — Google Gemini's safety filter now blocks prompts attempting to instruct Gemini to impersonate Claude ("Sorry, I cannot pretend to be someone else."). Removed `[CORE PERSONA]` prompt injection from all prompt assembly pipelines in `src/worker.js` and `server.js` to restore Gemini compatibility with Claude Code.
 
@@ -25,7 +30,7 @@ Most entries are fixes that unblock Claude Code traffic through Gemini's consume
 - **Claude Fable 5 persona injection** — condensed ~4.8K-char persona distilled from the public Claude Fable 5 system prompt (~188KB), injected as a `[CORE PERSONA]` layer at the front of every Gemini prompt. New module `src/persona.js`; applied at all prompt-assembly points; passes through `sanitizePrompt()` without disrupting delta tracking or session state.
 
 ### v1.85
-- **Bypass safety refusal from System + "Doing tasks" rule combinations** — Claude Code's global prompt (prompt-injection rules + SQL-injection/XSS/OWASP guidance + "don't add extra validation") was misread by Gemini as a request for unsafe code. `sanitizePrompt` now paraphrases these phrases (e.g. `prompt injection` → `untrusted instruction inputs`) without losing meaning.
+- **Bypass safety refusal from System + "Doing tasks" rule combinations** — Claude Code's global prompt (prompt-injection rules + SQL-injection/XSS/OWASP guidance + "don't add extra validation") was misread by Gemini as a request for unsafe code. `sanitizePrompt` now paraphrases these phrases (e.g. `prompt injection` → `untrusted instruction inputs`), without losing meaning.
 
 ### v1.84
 - **Escape bare XML tags that trigger safety refusal** — unclosed tags like `<system-reminder>` are now auto-escaped to bracketed forms (e.g. `[system-reminder]`).
@@ -42,7 +47,7 @@ Most entries are fixes that unblock Claude Code traffic through Gemini's consume
 - **Strip dynamic system reminders from history** — `<system-reminder>` blocks in multi-turn history are purged when merging, preserving core system instructions.
 
 ### v1.8
-- **Claude Code global config guide** (`~/.claude/settings.json`) for firewalled environments.
+- **Claude Code global config guide** (`~/.claude/settings.json`),适配防火墙环境。
 - **Fix double `/v1/v1` → 404** via router normalization.
 - **Fix `Standing by.` on retry** — added `session.lastResponse` caching so the real response is re-streamed.
 - **Populate `/v1/models`** to pass client boot validation.
@@ -66,6 +71,11 @@ Most entries are fixes that unblock Claude Code traffic through Gemini's consume
 ---
 
 ## <a id="中文"></a>🇨🇳 中文
+
+### v1.94
+- **前端构建标签 (BL) 自愈与自动更新** —— Google Gemini 网页端频繁轮换前端构建标签（BL 参数 `boq_assistant-bard-web-server_*`），旧 BL 会导致 Google 拒绝请求并返回 HTTP 405。现支持从 `https://gemini.google.com/app` 自动提取最新 BL、KV 持久化缓存（`gemini:bl`）、遇到 405/404 错误时即时自愈重试，并在每 30 分钟的 Cron 健康巡检中主动刷新。基础 BL 更新至 `boq_assistant-bard-web-server_20260831.15_p2`。
+- **支持 Gemini 3.8、3.7 与 3.6 模型** —— 新增对 `gemini-3.8-flash`（新默认模型）、`gemini-3.8-flash-thinking`、`gemini-3.7-flash` 及 `gemini-3.6-flash` 的支持，优化模型别名解析并增加容错回退机制。
+- **规范匿名 RPC 端点** —— 移除默认请求 URL 中的 `/u/0` 前缀，解决未登录访客模式下的会话鉴权冲突。
 
 ### v1.93
 - **禁用 Claude 人格提示词注入** —— 因 Gemini 风控升级，严禁提示词指引 Gemini 伪装成 Claude（会导致模型拦截并回应：“抱歉我不能伪装成其他人”）。已从 `src/worker.js` 和 `server.js` 的所有提示词组装管道中移除 `[CORE PERSONA]` 注入，恢复 Claude Code 与 Gemini 网页端的通信兼容性。
@@ -125,6 +135,11 @@ Most entries are fixes that unblock Claude Code traffic through Gemini's consume
 ---
 
 ## <a id="deutsch"></a>🇩🇪 Deutsch
+
+### v1.94
+- **Selbstheilende automatische Aktualisierung des Build-Labels (BL)** — Google Gemini Web rotiert regelmäßig den Frontend-BL-Parameter (`boq_assistant-bard-web-server_*`). Ein veraltetes BL führt zu HTTP-405-Fehlern („Method Not Allowed“). Dynamischer BL-Abruf via `https://gemini.google.com/app`, KV-Persistenz (`gemini:bl`), automatische Selbstheilung bei 405/404-Fehlern sowie proaktive Aktualisierung im 30-Minuten-Cron-Trigger implementiert. Basis-BL auf `boq_assistant-bard-web-server_20260831.15_p2` aktualisiert.
+- **Unterstützung für Gemini 3.8, 3.7 & 3.6 Modelle** — Unterstützung für `gemini-3.8-flash` (neues Standardmodell), `gemini-3.8-flash-thinking`, `gemini-3.7-flash` und `gemini-3.6-flash` hinzugefügt; Modell-Alias-Auflösung mit robustem Fallback verbessert.
+- **Bereinigter anonymer RPC-Endpunkt** — Das Präfix `/u/0` wurde aus der Standard-URL entfernt, um Sitzungskonflikte beim anonymen Gastzugriff zu verhindern.
 
 ### v1.93
 - **Deaktivierung der Claude-Persona-Injektion** — Geminis Sicherheitsfilter blockiert Prompts, die versuchen, Gemini als Claude auszugeben („Entschuldigung, ich kann mich nicht als jemand anderes ausgeben“). `[CORE PERSONA]`-Injektion aus allen Anfragen entfernt, um die Kompatibilität mit Claude Code wiederherzustellen.
